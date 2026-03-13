@@ -1,7 +1,64 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'delivery_tracking_screen.dart';
-import 'farmer_profile_screen.dart';
-import 'product_catalogue_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'order_history_screen.dart';
+import '../services/api_service.dart';
+
+
+// Cart model
+class CartItem {
+  final String productId;
+  final String name;
+  final double price;
+  final String unit;
+  int quantity;
+
+  CartItem({
+    required this.productId,
+    required this.name,
+    required this.price,
+    required this.unit,
+    this.quantity = 1,
+  });
+
+  double get total => price * quantity;
+
+  Map<String, dynamic> toJson() => {
+        'product': productId,
+        'name': name,
+        'qty': quantity,
+        'price': price,
+      };
+}
+
+// Global cart singleton
+class CartService {
+  static final CartService _instance = CartService._internal();
+  factory CartService() => _instance;
+  CartService._internal();
+
+  final List<CartItem> items = [];
+
+  void addItem(dynamic product) {
+    final id = product['_id']?.toString() ?? '';
+    final existing = items.firstWhere((i) => i.productId == id, orElse: () => CartItem(productId: '', name: '', price: 0, unit: ''));
+    if (existing.productId.isNotEmpty) {
+      existing.quantity++;
+    } else {
+      items.add(CartItem(
+        productId: id,
+        name: product['name'] ?? '',
+        price: (product['price'] ?? 0).toDouble(),
+        unit: product['unit'] ?? 'unit',
+      ));
+    }
+  }
+
+  double get subtotal => items.fold(0, (sum, item) => sum + item.total);
+  int get count => items.fold(0, (sum, item) => sum + item.quantity);
+  void removeItem(String productId) => items.removeWhere((i) => i.productId == productId);
+  void clear() => items.clear();
+}
 
 class ShoppingCartScreen extends StatefulWidget {
   const ShoppingCartScreen({super.key});
@@ -11,641 +68,277 @@ class ShoppingCartScreen extends StatefulWidget {
 }
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
-  bool _showToast = true;
+  final CartService _cart = CartService();
+  final ApiService _apiService = ApiService();
+  bool _isSubmitting = false;
+  final TextEditingController _noteController = TextEditingController();
+
+  Future<void> _submitOrder() async {
+    if (_cart.items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your cart is empty')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+    try {
+      // Get current user's region for shipping
+      final prefs = await SharedPreferences.getInstance();
+      final userStr = prefs.getString('user');
+      String region = 'Dakar';
+      if (userStr != null) {
+        final user = jsonDecode(userStr);
+        region = user['region'] ?? 'Dakar';
+      }
+
+      await _apiService.createOrder(
+        orderItems: _cart.items.map((i) => i.toJson()).toList(),
+        shippingAddress: {
+          'address': _noteController.text.isNotEmpty ? _noteController.text : 'Default address',
+          'city': region,
+          'postalCode': '00000',
+          'country': 'Senegal',
+        },
+        totalPrice: _cart.subtotal,
+      );
+
+      _cart.clear();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Order submitted successfully! Waiting for approval.'),
+            backgroundColor: Color(0xFF2D6C50),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final items = _cart.items;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F7F7), // background-light
+      backgroundColor: const Color(0xFFF6F7F7),
       body: SafeArea(
         child: Column(
           children: [
             // App Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(
-                  alpha: 0.9,
-                ), // backdrop-blur approx
-                border: Border(
-                  bottom: BorderSide(
-                    color: const Color(0xFF2D6C50).withValues(alpha: 0.1),
-                  ),
-                ),
-              ),
+              color: Colors.white,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent, // hover:bg-primary/5
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Color(0xFF0F172A),
-                          ),
-                          onPressed: () {},
-                          splashRadius: 20,
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+                        onPressed: () => Navigator.pop(context),
                       ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        'My Cart',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                          letterSpacing: -0.5,
-                        ),
-                      ),
+                      const SizedBox(width: 8),
+                      const Text('My Cart', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
                     ],
                   ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.transparent, // hover:bg-rose-50
+                  if (items.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.delete_sweep, color: Colors.red),
+                      onPressed: () => setState(() => _cart.clear()),
                     ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.delete_sweep,
-                        color: Color(0xFFE11D48),
-                      ), // rose-600
-                      onPressed: () {},
-                      splashRadius: 20,
-                    ),
-                  ),
                 ],
               ),
             ),
 
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Validation Toast
-                    if (_showToast)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF1F2), // rose-50
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFFFFE4E6),
-                            ), // rose-100
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.error_outline,
-                                color: Color(0xFFBE123C),
-                                size: 16,
-                              ), // rose-700
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: const Text(
-                                  'Quantity exceeds available stock (max 200kg)',
-                                  style: TextStyle(
-                                    color: Color(0xFFBE123C),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _showToast = false;
-                                  });
-                                },
-                                child: const Icon(
-                                  Icons.close,
-                                  color: Color(0xFFBE123C),
-                                  size: 16,
-                                ),
-                              ),
-                            ],
+              child: items.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text('Your cart is empty', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                          SizedBox(height: 8),
+                          Text('Go to catalogue to add products', style: TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        ...items.map((item) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildCartItem(item),
+                        )),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _noteController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            hintText: 'Note to distributor (optional)...',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
                           ),
                         ),
-                      ),
-
-                    // Cart Items List
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          _buildCartItem(
-                            title: 'Urea Premium N46%',
-                            category: 'Fertilizers',
-                            price: '\$45.00',
-                            unit: 'Unit: 50kg bag',
-                            quantity: 4,
-                            total: '\$180.00',
-                          ),
-                          const SizedBox(height: 16),
-                          _buildCartItem(
-                            title: 'BioGuard Organic',
-                            category: 'Crop Protection',
-                            price: '\$12.50',
-                            unit: 'Unit: 1L Bottle',
-                            quantity: 2,
-                            total: '\$25.00',
-                          ),
-                        ],
-                      ),
+                        const SizedBox(height: 140), // space for bottom sheet
+                      ],
                     ),
-
-                    // Form Inputs
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildFormLabel('Desired Delivery Date'),
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: const Color(
-                                  0xFF2D6C50,
-                                ).withValues(alpha: 0.2),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.calendar_today,
-                                  color: Color(0xFF2D6C50),
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                const Expanded(
-                                  child: Text(
-                                    'Oct 24, 2024',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0xFF0F172A),
-                                    ),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.expand_more,
-                                  color: Colors.blueGrey.shade400,
-                                  size: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildFormLabel('Note to Distributor'),
-                          const SizedBox(height: 6),
-                          TextField(
-                            maxLines: 4,
-                            minLines: 3,
-                            decoration: InputDecoration(
-                              hintText:
-                                  'Add specific instructions for delivery...',
-                              hintStyle: TextStyle(
-                                color: Colors.blueGrey.shade400,
-                                fontSize: 14,
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: const Color(
-                                    0xFF2D6C50,
-                                  ).withValues(alpha: 0.2),
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: const Color(
-                                    0xFF2D6C50,
-                                  ).withValues(alpha: 0.2),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF2D6C50),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),
       ),
-
-      // Sticky Bottom Summary using bottomSheet or directly in scaffold
-      bottomSheet: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(32),
-            topRight: Radius.circular(32),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 30,
-              offset: const Offset(0, -8),
-            ),
-          ],
-          border: Border(
-            top: BorderSide(
-              color: const Color(0xFF2D6C50).withValues(alpha: 0.05),
-            ),
-          ),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Subtotal',
-                  style: TextStyle(fontSize: 14, color: Colors.blueGrey.shade600),
-                ),
-                Text(
-                  '\$205.00',
-                  style: TextStyle(fontSize: 14, color: Colors.blueGrey.shade600),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Delivery Fee',
-                  style: TextStyle(fontSize: 14, color: Colors.blueGrey.shade600),
-                ),
-                const Text(
-                  'Free',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D6C50),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total Amount',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
-                  ),
-                ),
-                const Text(
-                  '\$205.00',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900, // black weight
-                    color: Color(0xFF2D6C50),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DeliveryTrackingScreen(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2D6C50),
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 4,
-                shadowColor: const Color(0xFF2D6C50).withValues(alpha: 0.2),
+      bottomSheet: items.isEmpty
+          ? const SizedBox.shrink()
+          : Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, -5))],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'Submit Order',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Subtotal', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                      Text('${_cart.subtotal.toStringAsFixed(0)} FCFA', style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                    ],
                   ),
-                  SizedBox(width: 8),
-                  Icon(Icons.send, size: 20),
+                  const SizedBox(height: 6),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Delivery Fee', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                      Text('Free', style: TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold, fontSize: 14)),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text('${_cart.subtotal.toStringAsFixed(0)} FCFA', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF2D6C50))),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _isSubmitting ? null : _submitOrder,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2D6C50),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 56),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Submit Order', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              SizedBox(width: 8),
+                              Icon(Icons.send, size: 18),
+                            ],
+                          ),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            // Minimal Navigation representation inline with the bottom sheet,
-            // though structurally it could be separated.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  'Home',
-                  Icons.home_outlined,
-                  false,
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProductCatalogueScreen(),
-                      ),
-                    );
-                  },
-                ),
-                _buildNavItem(
-                  'Products',
-                  Icons.inventory_2_outlined,
-                  false,
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProductCatalogueScreen(),
-                      ),
-                    );
-                  },
-                ),
-                _buildNavItem('Cart', Icons.shopping_cart, true, onTap: () {}),
-                _buildNavItem(
-                  'Profile',
-                  Icons.person_outline,
-                  false,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const FarmerProfileScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _buildCartItem({
-    required String title,
-    required String category,
-    required String price,
-    required String unit,
-    required int quantity,
-    required String total,
-  }) {
+  Widget _buildCartItem(CartItem item) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF2D6C50).withValues(alpha: 0.1),
-        ),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.blueGrey.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.image,
-                color: Colors.blueGrey,
-                size: 24,
-              ), // Placeholder for actual image
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFF2D6C50,
-                                ).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                category.toUpperCase(),
-                                style: const TextStyle(
-                                  color: Color(0xFF2D6C50),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        price,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D6C50),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    unit,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blueGrey.shade500,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(
-                              0xFF2D6C50,
-                            ).withValues(alpha: 0.1),
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFF2D6C50,
-                                ).withValues(alpha: 0.05),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.remove,
-                                color: Color(0xFF2D6C50),
-                                size: 16,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 24,
-                              child: Text(
-                                quantity.toString(),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0F172A),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF2D6C50),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        'Total: $total',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFormLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: Text(
-        label.toUpperCase(),
-        style: TextStyle(
-          color: Colors.blueGrey.shade500,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(
-    String label,
-    IconData icon,
-    bool isActive, {
-    required VoidCallback onTap,
-  }) {
-    final color = isActive
-        ? const Color(0xFF2D6C50)
-        : Color(0xFF94A3B8); // primary or slate-400
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 10,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+          Container(
+            width: 56, height: 56,
+            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+            child: const Icon(Icons.inventory_2_outlined, color: Colors.grey),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text('${item.price.toStringAsFixed(0)} FCFA / ${item.unit}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Quantity selector
+                    Container(
+                      decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(8)),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.remove, size: 16),
+                            onPressed: () {
+                              if (item.quantity > 1) {
+                                setState(() => item.quantity--);
+                              } else {
+                                setState(() => _cart.removeItem(item.productId));
+                              }
+                            },
+                          ),
+                          Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          IconButton(
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.add, size: 16, color: Color(0xFF2D6C50)),
+                            onPressed: () => setState(() => item.quantity++),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('${item.total.toStringAsFixed(0)} FCFA', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D6C50))),
+                  ],
+                ),
+              ],
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 18, color: Colors.grey),
+            onPressed: () => setState(() => _cart.removeItem(item.productId)),
           ),
         ],
       ),

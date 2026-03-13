@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'ai_assistant_screen.dart';
-import 'delivery_tracking_screen.dart';
 import 'farmer_profile_screen.dart';
 import 'order_history_screen.dart';
 import 'shopping_cart_screen.dart';
@@ -162,23 +160,30 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
                           itemCount: _filteredProducts.length,
                           itemBuilder: (context, index) {
                             final product = _filteredProducts[index];
-                            return _buildProductCard(
-                              title: product['name'],
-                              unit: product['unit'] ?? 'unit',
-                              price: '${product['price']} FCFA',
-                              category: product['category'],
-                              inStock: (product['stockQuantity'] ?? 0) > 0,
-                            );
+                            return _buildProductCard(product);
                           },
                         ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShoppingCartScreen())),
-        backgroundColor: const Color(0xFF2D6C50),
-        child: const Icon(Icons.shopping_cart, color: Colors.white),
+      floatingActionButton: Stack(
+        children: [
+          FloatingActionButton(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShoppingCartScreen())).then((_) => setState(() {})),
+            backgroundColor: const Color(0xFF2D6C50),
+            child: const Icon(Icons.shopping_cart, color: Colors.white),
+          ),
+          if (CartService().count > 0)
+            Positioned(
+              right: 0, top: 0,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                child: Text('${CartService().count}', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
@@ -231,13 +236,8 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
     );
   }
 
-  Widget _buildProductCard({
-    required String title,
-    required String unit,
-    required String price,
-    required String category,
-    required bool inStock,
-  }) {
+  Widget _buildProductCard(dynamic product) {
+    final inStock = (product['stockQuantity'] ?? 0) > 0;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -259,8 +259,8 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 2),
-          Text(unit, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(product['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(product['unit'] ?? 'unit', style: const TextStyle(fontSize: 11, color: Colors.grey)),
           const SizedBox(height: 4),
           Row(
             children: [
@@ -270,7 +270,33 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          Text(price, style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold, fontSize: 16)),
+          Text('${product['price']} FCFA', style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold, fontSize: 14)),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: inStock
+                  ? () {
+                      CartService().addItem(product);
+                      setState(() {});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${product['name']} added to cart'),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: const Color(0xFF2D6C50),
+                        ),
+                      );
+                    }
+                  : null,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF2D6C50),
+                side: const BorderSide(color: Color(0xFF2D6C50)),
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text('Add to Cart', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+            ),
+          ),
         ],
       ),
     );
