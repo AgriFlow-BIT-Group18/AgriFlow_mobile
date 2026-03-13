@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgriFlow - My Cart</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d6c50",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#151d19",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<!-- Mobile Screen Wrapper -->
+<div class="relative mx-auto min-h-screen max-w-md bg-white dark:bg-background-dark flex flex-col shadow-2xl">
+<!-- App Bar -->
+<header class="sticky top-0 z-20 flex items-center justify-between bg-white/80 dark:bg-background-dark/80 px-4 py-4 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center gap-3">
+<button class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-primary/5">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">My Cart</h1>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-rose-600 hover:bg-rose-50">
+<span class="material-symbols-outlined">delete_sweep</span>
+</button>
+</header>
+<!-- Validation Toast (Visible) -->
+<div class="px-4 pt-4">
+<div class="flex items-center gap-3 rounded-xl bg-rose-50 p-3 text-rose-700 border border-rose-100">
+<span class="material-symbols-outlined text-sm">error</span>
+<p class="text-xs font-medium">Quantity exceeds available stock (max 200kg)</p>
+</div>
+</div>
+<!-- Cart Items List -->
+<main class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Item 1 -->
+<div class="group relative overflow-hidden rounded-xl border border-primary/10 bg-white dark:bg-slate-900 shadow-sm">
+<div class="flex p-3 gap-3">
+<div class="h-[60px] w-[60px] flex-shrink-0 rounded-lg bg-cover bg-center" data-alt="Bags of urea fertilizer in a warehouse" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBqwLgJXRjWETqCMCE-9ToJu9ix0xmNAuudRUtq0_dVozMAzU88XVslk9NfUrulXV3W3d355fHD9UsPQ6jpRMTZwdXmPa8PPSsuTIeKHSm7LxICOvZ7CSj6F3hNAB8eK2R8P9M5AIL_jqdFZzh_BOBi8dR-UVJ7-pDrOQJu6R6seu0GMsuPLPwoI63-0m3_g9KUHEwLJYoiEJ2adaglrwcOn8q8mBNnlFENzzUuGMlYi3Gy3h77YUIlv0L5pAQRF15fRGibKZda-53g')"></div>
+<div class="flex flex-1 flex-col">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-bold text-sm leading-tight">Urea Premium N46%</h3>
+<span class="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Fertilizers</span>
+</div>
+<p class="text-sm font-bold text-primary">$45.00</p>
+</div>
+<p class="mt-1 text-xs text-slate-500">Unit: 50kg bag</p>
+<div class="mt-3 flex items-center justify-between">
+<div class="flex items-center gap-3 rounded-lg border border-primary/10 px-2 py-1">
+<button class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/5 text-primary">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<span class="text-sm font-bold w-4 text-center">4</span>
+<button class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<p class="text-sm font-black">Total: $180.00</p>
+</div>
+</div>
+</div>
+<!-- Swipe action hint (simulated) -->
+<div class="absolute inset-y-0 -right-16 flex w-16 items-center justify-center bg-rose-600 text-white">
+<span class="material-symbols-outlined">delete</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group relative overflow-hidden rounded-xl border border-primary/10 bg-white dark:bg-slate-900 shadow-sm">
+<div class="flex p-3 gap-3">
+<div class="h-[60px] w-[60px] flex-shrink-0 rounded-lg bg-cover bg-center" data-alt="Organic liquid pesticide bottle" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDMl-7cmd9gyvUbht2P9GP9jO2pC_u38-RnOMlKJV9JBMbtdbT_ePVrxDTVuInIx3dEDn8uY7mjsomzJOQ0cxfI_NFKxFLzJO5dWpMz3drcu0GgqARHsfPwQeEEIl_qZGh_HY00W0Ngsmpr0hVdHKrs7JD-nm5K4TVXzw4PdRWIlsNRNI3XhT0A1NWwjGoKxVO5TuWXsDttZBPGOVujDzFvB2HlZWm1Z292QRXC1bXvxCFlvo-B4ZA9-e-Z1OScbHgWDloO08_HH-JK')"></div>
+<div class="flex flex-1 flex-col">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-bold text-sm leading-tight">BioGuard Organic</h3>
+<span class="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Crop Protection</span>
+</div>
+<p class="text-sm font-bold text-primary">$12.50</p>
+</div>
+<p class="mt-1 text-xs text-slate-500">Unit: 1L Bottle</p>
+<div class="mt-3 flex items-center justify-between">
+<div class="flex items-center gap-3 rounded-lg border border-primary/10 px-2 py-1">
+<button class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/5 text-primary">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<span class="text-sm font-bold w-4 text-center">2</span>
+<button class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<p class="text-sm font-black">Total: $25.00</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Inputs -->
+<div class="space-y-4 pt-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Desired Delivery Date</label>
+<div class="flex items-center gap-3 rounded-xl border border-primary/20 bg-white p-3">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+<input class="flex-1 border-none bg-transparent p-0 text-sm focus:ring-0" readonly="" type="text" value="Oct 24, 2024"/>
+<span class="material-symbols-outlined text-slate-400">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Note to Distributor</label>
+<textarea class="min-h-[80px] w-full rounded-xl border border-primary/20 bg-white p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Add specific instructions for delivery..."></textarea>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Summary -->
+<footer class="rounded-t-[2rem] bg-white dark:bg-background-dark p-6 shadow-[0_-8px_30px_rgb(0,0,0,0.05)] border-t border-primary/5">
+<div class="space-y-2 mb-6">
+<div class="flex justify-between text-sm text-slate-600">
+<span>Subtotal</span>
+<span>$205.00</span>
+</div>
+<div class="flex justify-between text-sm text-slate-600">
+<span>Delivery Fee</span>
+<span class="font-bold text-primary">Free</span>
+</div>
+<div class="flex justify-between pt-2">
+<span class="text-lg font-bold">Total Amount</span>
+<span class="text-xl font-black text-primary">$205.00</span>
+</div>
+</div>
+<button class="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-transform">
+<span>Submit Order</span>
+<span class="material-symbols-outlined">send</span>
+</button>
+</footer>
+<!-- Bottom Sheet Overlay (Hidden usually, displayed for UI representation) -->
+<div class="absolute inset-0 z-50 flex items-end bg-slate-900/40 backdrop-blur-sm transition-opacity" style="display: none;"> <!-- Set style to "" to show -->
+<div class="w-full rounded-t-[2.5rem] bg-white dark:bg-slate-900 p-8 text-center animate-slide-up shadow-2xl">
+<div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+<span class="material-symbols-outlined text-5xl text-primary fill-icon">check_circle</span>
+</div>
+<h2 class="mb-2 text-2xl font-black">Order Submitted!</h2>
+<p class="mb-8 text-sm leading-relaxed text-slate-500">Order <span class="font-bold text-slate-900">#FIDS-2024-0892</span> has been submitted. You'll be notified when it's approved.</p>
+<div class="space-y-4">
+<button class="h-14 w-full rounded-xl bg-primary text-white font-bold shadow-md">Track My Orders</button>
+<button class="h-10 w-full text-sm font-bold text-primary">Continue Shopping</button>
+</div>
+<div class="mt-4 h-1 w-12 mx-auto bg-slate-200 rounded-full"></div>
+</div>
+</div>
+<!-- Navigation Bar -->
+<nav class="flex border-t border-primary/5 bg-white px-6 pb-2 pt-2">
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-[10px] font-medium">Products</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-icon">shopping_cart</span>
+<span class="text-[10px] font-bold">Cart</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</nav>
+</div>
+<!-- Empty State Example (Hidden) -->
+<div class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-white p-8 text-center">
+<div class="relative mb-8 h-48 w-48 rounded-full bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-8xl text-primary/30">shopping_basket</span>
+<div class="absolute bottom-4 right-4 h-12 w-12 rounded-full bg-white flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-primary">add</span>
+</div>
+</div>
+<h2 class="mb-2 text-xl font-bold">Your cart is empty</h2>
+<p class="mb-10 text-slate-500">Looks like you haven't added any agricultural supplies to your cart yet.</p>
+<button class="h-14 w-full max-w-xs rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20">
+            Browse Products
+        </button>
+</div>
+</body></html>

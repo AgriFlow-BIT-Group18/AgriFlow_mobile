@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgriFlow Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d6c50",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#151d19",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="max-w-md mx-auto min-h-screen bg-white dark:bg-background-dark shadow-xl overflow-hidden flex flex-col relative">
+<!-- Top Navigation -->
+<div class="flex items-center justify-end p-6 z-10">
+<button class="text-primary font-semibold text-sm py-2 px-4 hover:bg-primary/10 rounded-lg">Skip</button>
+</div>
+<!-- Onboarding Carousel Container (Visual representation of 3 screens) -->
+<div class="flex-1 overflow-x-auto snap-x snap-mandatory hide-scroll flex">
+<!-- Screen 1 -->
+<div class="min-w-full snap-start flex flex-col">
+<div class="px-6 flex-1 flex flex-col">
+<div class="aspect-square w-full rounded-xl bg-primary/5 flex items-center justify-center mb-8 overflow-hidden">
+<div class="w-full h-full bg-center bg-no-repeat bg-cover" data-alt="African farmer checking smartphone in lush green farm" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgafdoGerJf6EZN4naCZxArmiAiPigoUv7MBha2rX_dxOoSTkP24n3hTD0sJT3TgdGMnUyny7GiQdPvOfqqJRoFOxx7293S30SAn23hJCi3OQHKysXVZjL20MDzYzkdwDrwJy1AOw7iellFInCmftQMEIl2SdYf3gxZreQPxDhl3Qdrc-vezLaWJTm5uO-L0udQ8yPLXgAaEWDs2niWMyfCPLqdg32BZDn2wn-7iDlCMqUhKJUIycRGcxrWNr3n5A_caPtEoCAWee1')">
+</div>
+</div>
+<!-- Language Toggle -->
+<div class="flex gap-2 mb-6">
+<button class="flex h-10 items-center justify-center rounded-lg bg-primary text-white px-5 text-sm font-semibold shadow-sm">EN</button>
+<button class="flex h-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-5 text-sm font-semibold">FR</button>
+</div>
+<h1 class="text-3xl font-bold leading-tight mb-4">Your Farm Inputs, Digital</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">Order seeds, fertilizers and pesticides from your phone, anytime.</p>
+</div>
+<!-- Bottom Controls Screen 1 -->
+<div class="p-6 pt-0">
+<div class="flex justify-center gap-2 mb-8">
+<div class="h-2 w-8 rounded-full bg-primary"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+                        Next
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Screen 2 (Layout Reference) -->
+<div class="min-w-full snap-start flex flex-col hidden">
+<div class="px-6 flex-1 flex flex-col">
+<div class="aspect-square w-full rounded-xl bg-orange-50 flex items-center justify-center mb-8 overflow-hidden">
+<div class="w-full h-full bg-center bg-no-repeat bg-cover" data-alt="Delivery truck on a route with map location pins" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPWvxm-41dZFRg3bjAXHf8dl24TMHHhqhxHCFEGT1s5ERyzhMv13KWkfD6e6jep9dESFdTqx9iMxunkonF1hloSksEa_qbq6ZaEI4FyVcNU-wtRjh52Gqn1bKW2DzP3fWcN4K4ScZ-qpFSQqcNwyYjM-SkMGe9FM-gigbIYZLR_nmLFtKBcdJMZoP4U2MyKMSbgUmt1AdGT5CyDGpPmc_p7AYxue0WV3QKRyA0YpK3BUFHKPabkMzJ1if1r2kPz4-JRlsX67SQse4x')">
+</div>
+</div>
+<h1 class="text-3xl font-bold leading-tight mb-4">Track Every Delivery</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">Know exactly where your order is, from approval to your doorstep.</p>
+</div>
+<div class="p-6 pt-0">
+<div class="flex justify-center gap-2 mb-8">
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-8 rounded-full bg-primary"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg">Next</button>
+</div>
+</div>
+<!-- Screen 3 (Layout Reference) -->
+<div class="min-w-full snap-start flex flex-col hidden">
+<div class="px-6 flex-1 flex flex-col">
+<div class="aspect-square w-full rounded-xl bg-primary/5 flex items-center justify-center mb-8 overflow-hidden">
+<div class="w-full h-full bg-center bg-no-repeat bg-cover" data-alt="Smartphone screen showing success notification and green checkmark" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCN71WDGZ8nc0TpgBnMbV5kQHmgD7B4pORz5dqnJ8L-5V7d6TOw9Z2t1UotYeVIn0JQYzSIPYd65vygEiQVqc7-EmwYMXIaNJZFkgHdIEvA3_6z3e2DPeDrUUHK3Tn8O7m-NyjqADa5rrrc4fZhHLsc0IlyMbfa-xFP7EjUhyW36foaNXodO8i0ppQQ5jjZrmmgJU1eCdgwXv5exf-CbVD192eR7DeoRnoaZNCwGysjEHwP7wvYx5yR3PWE7RtgaLYQDYASW2E_SBsY')">
+</div>
+</div>
+<h1 class="text-3xl font-bold leading-tight mb-4">Always in the Know</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">Get notified the moment your order is approved, shipped, or delivered.</p>
+</div>
+<div class="p-6 pt-0">
+<div class="flex justify-center gap-2 mb-8">
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-8 rounded-full bg-primary"></div>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg mb-4">Create Account</button>
+<button class="w-full text-primary font-semibold py-2">I already have an account</button>
+</div>
+</div>
+</div>
+<!-- Floating Navigation UI for demo purposes to show other screens -->
+<div class="absolute bottom-40 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="bg-black/50 text-white px-3 py-1 rounded-full text-xs">Swipe to view other screens</p>
+</div>
+</div>
+<!-- Screen 2 Static Preview (to ensure design requirements are visible) -->
+<div class="max-w-md mx-auto mt-12 mb-12 min-h-screen bg-white dark:bg-background-dark shadow-xl overflow-hidden flex flex-col relative rounded-xl border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-end p-6">
+<button class="text-primary font-semibold text-sm py-2 px-4">Skip</button>
+</div>
+<div class="px-6 flex-1 flex flex-col">
+<div class="aspect-square w-full rounded-xl bg-orange-50/30 flex items-center justify-center mb-8 overflow-hidden border border-orange-100 dark:border-orange-900/30">
+<div class="w-full h-full bg-center bg-no-repeat bg-cover" data-alt="A delivery truck driving through farm lands on a sunny day" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDuVXw5rTGd11cS4Y3go2dnid8s_po_vzhOLceFe9U03uL7lmpIRmk8hTlmi9Eq2N9PU5fYGooo3gmZdt88WZOwjhAOdwb93pmgfkhbPQbHPpaAniD3rc7o55NT7sd6heEMjLqQ31M3R9cRklEdQLHIQjCi0OsVDFmGIhw2A0uKUQN0j6mSfngjM4GSytzPo1f16dgnXatfjy2vUaeBVmtSW69VI0pXgO9iSE96k7GPxrH-4P76-vW1bc-rDE73671mqL4rre_gwJlW')">
+</div>
+</div>
+<h1 class="text-3xl font-bold leading-tight mb-4">Track Every Delivery</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">Know exactly where your order is, from approval to your doorstep.</p>
+</div>
+<div class="p-6 pt-0">
+<div class="flex justify-center gap-2 mb-8">
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-8 rounded-full bg-primary"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+                Next
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Screen 3 Static Preview (Final step) -->
+<div class="max-w-md mx-auto mt-12 mb-20 min-h-screen bg-white dark:bg-background-dark shadow-xl overflow-hidden flex flex-col relative rounded-xl border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-end p-6">
+<button class="text-primary font-semibold text-sm py-2 px-4">Skip</button>
+</div>
+<div class="px-6 flex-1 flex flex-col">
+<div class="aspect-square w-full rounded-xl bg-primary/5 flex items-center justify-center mb-8 overflow-hidden border border-primary/10">
+<div class="w-full h-full bg-center bg-no-repeat bg-cover" data-alt="Digital notification icons showing order success and delivery" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAi6rnEw1H2pta37bG0k32EFRCfB4wesP8VjFQ6IH97jFUf8ObL3qaO7Dq_SbUU1X5vjSKpdLtC2jWOtpBSAMeIg5_9ySt77JEB4LgX0mOhYhpig88UN4yGFKUVu-IFKxkGY7z2N7_P78YWB8aZd5425c60p4nkKFebYXK1D1IfdPDcWczdCN8o6LwXA9qqZHBYuombW_NWOn7Hf7IkC1pX58Vr8sYqMzmNaDoIr_mW6_3o_C_zOnbA69rsQunGRnpzG2sEExqwWR1j')">
+</div>
+</div>
+<h1 class="text-3xl font-bold leading-tight mb-4">Always in the Know</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">Get notified the moment your order is approved, shipped, or delivered.</p>
+</div>
+<div class="p-6 pt-0">
+<div class="flex justify-center gap-2 mb-8">
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-8 rounded-full bg-primary"></div>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg mb-4 active:scale-[0.98] transition-transform">Create Account</button>
+<button class="w-full text-primary font-semibold py-4 hover:bg-primary/5 rounded-xl transition-colors">I already have an account</button>
+</div>
+</div>
+</body></html>

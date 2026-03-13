@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgriFlow - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d6c50",
+                        "primary-light": "#52B788",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#151d19",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-agriflow-gradient {
+            background: linear-gradient(180deg, #2D6A4F 0%, #52B788 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<!-- Main Container (Simulating Mobile Screen) -->
+<div class="relative flex min-h-screen w-full flex-col bg-agriflow-gradient overflow-hidden">
+<!-- Top Logo Section (20%) -->
+<div class="flex flex-col items-center justify-center pt-12 pb-8 text-white h-[25vh]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-5xl">energy_savings_leaf</span>
+<h1 class="text-3xl font-bold tracking-tight">AgriFlow</h1>
+</div>
+</div>
+<!-- White Card (Remaining 75-80%) -->
+<div class="flex-1 bg-white dark:bg-slate-900 rounded-t-[24px] shadow-2xl flex flex-col p-6 overflow-y-auto">
+<!-- Error State: Account Locked (Amber Banner) -->
+<div class="mb-4 flex items-center gap-3 bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-800 text-sm">
+<span class="material-symbols-outlined text-lg">lock_clock</span>
+<p>Account locked. Try again in 14 minutes</p>
+</div>
+<div class="text-center mb-8">
+<h2 class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight">Sign In</h2>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal mt-1">Enter your credentials to continue</p>
+</div>
+<!-- Form -->
+<form class="space-y-4">
+<!-- Email Field -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Email address</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">mail</span>
+</div>
+<input class="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" placeholder="Your email address" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Password</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">lock</span>
+</div>
+<input class="w-full pl-12 pr-12 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" placeholder="Your password" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<!-- Forgot Password -->
+<div class="flex justify-end">
+<a class="text-sm font-semibold text-primary hover:text-primary-light" href="#">Forgot password?</a>
+</div>
+<!-- Sign In Button (Loading State Shown as an example button below) -->
+<button class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-4 rounded-xl shadow-md transition-all active:scale-[0.98] h-[56px] flex items-center justify-center" type="submit">
+                    Sign In
+                </button>
+<!-- Alternative: Phone Sign In -->
+<div class="relative flex items-center py-4">
+<div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+<span class="flex-shrink mx-4 text-slate-400 text-sm">OR</span>
+<div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+</div>
+<button class="w-full border-2 border-primary text-primary font-bold py-4 rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined">phone_android</span>
+                    Sign in with Phone Number
+                </button>
+</form>
+<!-- Bottom Spacer and Help -->
+<div class="mt-auto pt-8 pb-4 text-center">
+<p class="text-sm text-slate-500">Need help? <a class="text-slate-700 font-semibold underline decoration-primary/30" href="#">Contact your distributor</a></p>
+</div>
+</div>
+<!-- Error State: Red Snackbar (Positioned Fixed at Bottom) -->
+<div class="fixed bottom-6 left-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center justify-between transition-transform translate-y-0">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined">error</span>
+<span class="text-sm font-medium">Incorrect email or password</span>
+</div>
+<button class="material-symbols-outlined text-lg">close</button>
+</div>
+</div>
+<!-- Hidden Loading Spinner Component for reference if button were in loading state -->
+<div class="hidden">
+<svg class="animate-spin h-5 w-5 text-white" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+</svg>
+</div>
+</body></html>

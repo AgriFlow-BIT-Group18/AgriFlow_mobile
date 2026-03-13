@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d6c50",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#151d19",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-white dark:bg-background-dark shadow-xl overflow-x-hidden">
+<header class="flex items-center bg-white dark:bg-background-dark p-4 sticky top-0 z-50 border-b border-primary/10">
+<button class="text-primary flex size-10 shrink-0 items-center justify-center hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 ml-2 text-center">Delivery Tracking</h2>
+<button class="text-primary flex size-10 shrink-0 items-center justify-center hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</header>
+<main class="flex flex-col flex-1">
+<div class="p-4">
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-800 p-4 shadow-sm border border-primary/10">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">Delivery #DEL-2024-0234</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal">Order #FIDS-2024-0892</p>
+</div>
+<span class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                            En Route
+                        </span>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700">
+<div class="flex flex-col">
+<p class="text-slate-500 dark:text-slate-400 text-xs">Estimated Arrival</p>
+<p class="text-primary font-bold">Today, 3:30 PM</p>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-primary/20 flex items-center justify-center text-[10px] font-bold">NPK</div>
+<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-primary/20 flex items-center justify-center text-[10px] font-bold">SEED</div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-4 pb-4">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-inner border border-primary/10 bg-slate-200">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Map showing vehicle route from Kumasi to farm" data-location="Kumasi, Ghana" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCg5g2mCe3Jq968jQpPYet7S7bTkDUuLlwTB6Luj8XMCbr7Qum14l-_LPcRK4zow_VzC023yFAM3TZ3ijPjyg6OioC7nl3QdRyfyOJ3WIFsA0CMxhyRo4hxxlgFqC0lDf_61WFc6Xq-CF6Ot2P5Rtbrda6KsuoOYXtpj46c0tEkNnIp9M_eVZDsq9haVyGdeo3hJirwFIRW_Jc4PdA2MIzNED1EERaikrASAz5-yDQ5ojE0924XWFhxBAznw1LzszOTjKD1l8K35Iw4');"></div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none" viewbox="0 0 400 300">
+<path d="M50,250 Q150,200 200,150 T350,50" fill="none" stroke="#2d6c50" stroke-dasharray="8 4" stroke-width="4"></path>
+<circle cx="350" cy="50" fill="#2d6c50" r="6"></circle>
+<circle cx="50" cy="250" fill="#2d6c50" r="6"></circle>
+</svg>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-8 h-8 bg-primary/40 rounded-full animate-ping"></div>
+<div class="relative z-10 bg-primary text-white p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4 px-4 pb-6">
+<div class="flex items-center gap-4 bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-primary/10">
+<div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-lg">
+                        JK
+                    </div>
+<div class="flex flex-col flex-1">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">Jean-Baptiste K.</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Toyota Hilux — GR-2847-22</p>
+</div>
+<button class="bg-primary/10 text-primary p-3 rounded-full hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined">call</span>
+</button>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-primary/10 space-y-4">
+<div class="flex gap-3">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-sm">location_on</span>
+<div class="w-px h-full border-l border-dashed border-primary/30 my-1"></div>
+<span class="material-symbols-outlined text-orange-500 text-sm">home_pin</span>
+</div>
+<div class="flex flex-col gap-4 flex-1">
+<div>
+<p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Pickup Location</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">AgriFlow Distribution Center, Kumasi</p>
+</div>
+<div>
+<p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Delivery Address</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">Farm Plot 42, Ashanti Region</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-primary/10">
+<h4 class="text-slate-900 dark:text-slate-100 text-sm font-bold mb-3 uppercase tracking-wider text-xs">Items in this shipment</h4>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/5 rounded-lg text-primary">
+<span class="material-symbols-outlined text-xl">pill</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-medium">NPK 15-15-15 Fertilizer</p>
+<p class="text-xs text-slate-500">10 bags x 50kg</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/5 rounded-lg text-primary">
+<span class="material-symbols-outlined text-xl">eco</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-medium">Hybrid Maize Seeds</p>
+<p class="text-xs text-slate-500">5 bags x 10kg</p>
+</div>
+</div>
+</div>
+</div>
+<div class="py-4">
+<div class="flex justify-between relative mb-2 px-2">
+<div class="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0"></div>
+<div class="absolute top-1/2 left-0 w-2/3 h-0.5 bg-primary -translate-y-1/2 z-0"></div>
+<div class="relative z-10 flex flex-col items-center gap-1">
+<div class="w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm"></div>
+<span class="text-[10px] font-medium text-slate-500 uppercase">Ready</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-1">
+<div class="w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm"></div>
+<span class="text-[10px] font-medium text-slate-500 uppercase">Shipped</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-1">
+<div class="w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-lg ring-4 ring-primary/20"></div>
+<span class="text-[10px] font-bold text-primary uppercase">En Route</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-1">
+<div class="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 border-4 border-white dark:border-background-dark shadow-sm"></div>
+<span class="text-[10px] font-medium text-slate-400 uppercase">Delivered</span>
+</div>
+</div>
+</div>
+<div class="pt-2 sticky bottom-4">
+<button class="w-full h-14 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">verified</span>
+                        Confirm Receipt
+                    </button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

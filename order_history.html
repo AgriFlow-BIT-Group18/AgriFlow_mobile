@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d6c50",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#151d19",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>AgriFlow - My Orders</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<!-- Mobile Screen Wrapper (Simulating Flutter App Viewport) -->
+<div class="relative mx-auto min-h-screen max-w-md bg-background-light dark:bg-background-dark pb-24 shadow-2xl">
+<!-- App Bar -->
+<header class="sticky top-0 z-20 flex items-center justify-between bg-white dark:bg-background-dark px-4 py-4 shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span>
+<h1 class="text-xl font-bold tracking-tight">My Orders</h1>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-primary/20">
+<span class="material-symbols-outlined text-slate-700 dark:text-primary">filter_list</span>
+</button>
+</header>
+<!-- Filter Tabs (Horizontal Scroll) -->
+<div class="sticky top-[68px] z-10 flex gap-2 overflow-x-auto bg-background-light dark:bg-background-dark px-4 py-3 no-scrollbar">
+<button class="whitespace-nowrap rounded-full bg-primary px-5 py-1.5 text-sm font-semibold text-white">All</button>
+<button class="whitespace-nowrap rounded-full bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/30 px-5 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300">Pending</button>
+<button class="whitespace-nowrap rounded-full bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/30 px-5 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300">Approved</button>
+<button class="whitespace-nowrap rounded-full bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/30 px-5 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300">In Delivery</button>
+<button class="whitespace-nowrap rounded-full bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/30 px-5 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300">Delivered</button>
+<button class="whitespace-nowrap rounded-full bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/30 px-5 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300">Rejected</button>
+</div>
+<!-- Order List -->
+<main class="flex flex-col gap-4 p-4">
+<!-- Card: Pending -->
+<div class="rounded-xl bg-white dark:bg-slate-900/50 p-4 shadow-sm border border-slate-100 dark:border-white/5">
+<div class="mb-2 flex items-center justify-between">
+<span class="text-sm font-bold text-primary">#FIDS-2024-0892</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Aug 12, 2024</span>
+</div>
+<p class="mb-4 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                    50kg Fertilizer NPK, 2 bags Hybrid Corn Seeds
+                </p>
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">
+<span class="mr-1.5 h-2 w-2 rounded-full bg-amber-500"></span>
+                        Pending
+                    </span>
+<span class="text-lg font-bold text-slate-900 dark:text-slate-100">$420.00</span>
+</div>
+</div>
+<!-- Card: In Delivery -->
+<div class="rounded-xl bg-white dark:bg-slate-900/50 p-4 shadow-sm border border-slate-100 dark:border-white/5">
+<div class="mb-2 flex items-center justify-between">
+<span class="text-sm font-bold text-primary">#FIDS-2024-0885</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Aug 10, 2024</span>
+</div>
+<p class="mb-4 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                    100kg Urea Fertilizer, 5 bags Paddy Seeds (Premium)
+                </p>
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center rounded-full bg-orange-500 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+<span class="material-symbols-outlined mr-1 text-[14px]">local_shipping</span>
+                        In Delivery
+                    </span>
+<span class="text-lg font-bold text-slate-900 dark:text-slate-100">$1,150.00</span>
+</div>
+</div>
+<!-- Card: Delivered -->
+<div class="rounded-xl bg-white dark:bg-slate-900/50 p-4 shadow-sm border border-slate-100 dark:border-white/5">
+<div class="mb-2 flex items-center justify-between">
+<span class="text-sm font-bold text-primary">#FIDS-2024-0721</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Aug 05, 2024</span>
+</div>
+<p class="mb-4 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                    Organic Compost 200kg, Garden Tools Set
+                </p>
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center rounded-full bg-green-600 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+<span class="material-symbols-outlined mr-1 text-[14px]">check_circle</span>
+                        Delivered
+                    </span>
+<span class="text-lg font-bold text-slate-900 dark:text-slate-100">$890.00</span>
+</div>
+</div>
+<!-- Card: Rejected -->
+<div class="rounded-xl bg-white dark:bg-slate-900/50 p-4 shadow-sm border border-slate-100 dark:border-white/5 opacity-80">
+<div class="mb-2 flex items-center justify-between">
+<span class="text-sm font-bold text-primary">#FIDS-2024-0612</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">July 28, 2024</span>
+</div>
+<p class="mb-4 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                    Pesticide Alpha-Z, Irrigation Pump Spare Parts
+                </p>
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center rounded-full bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+<span class="material-symbols-outlined mr-1 text-[14px]">cancel</span>
+                        Rejected
+                    </span>
+<span class="text-lg font-bold text-slate-900 dark:text-slate-100">$340.00</span>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Bar Component -->
+<nav class="fixed bottom-0 left-0 right-0 mx-auto max-w-md border-t border-slate-200 dark:border-white/10 bg-white/95 dark:bg-background-dark/95 backdrop-blur-md px-4 pb-6 pt-3 flex justify-between items-center z-30">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium uppercase tracking-tight">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-bold">shopping_bag</span>
+<span class="text-[10px] font-bold uppercase tracking-tight">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">storefront</span>
+<span class="text-[10px] font-medium uppercase tracking-tight">Market</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium uppercase tracking-tight">Profile</span>
+</a>
+</nav>
+</div>
+<!-- Section Divider for Demo Purpose (Simulating Detail Screen) -->
+<div class="hidden lg:block h-screen w-px bg-slate-300 dark:bg-slate-700 fixed left-1/2 ml-64 top-0"></div>
+<!-- Order Detail Screen (Simulated as a separate view on the side for this prompt) -->
+<div class="relative mx-auto mt-10 min-h-screen max-w-md bg-background-light dark:bg-background-dark pb-24 shadow-2xl overflow-hidden rounded-t-3xl">
+<!-- Header Detail -->
+<div class="bg-white dark:bg-background-dark p-6 shadow-sm">
+<div class="flex items-center gap-2 text-slate-500 mb-2">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span class="text-sm font-medium">Order Detail</span>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<h2 class="text-2xl font-black text-slate-900 dark:text-slate-100">#FIDS-2024-0885</h2>
+<p class="text-sm text-slate-500">Placed on Aug 10, 2024 • 09:45 AM</p>
+</div>
+</div>
+<div class="mt-4">
+<span class="inline-flex w-full items-center justify-center rounded-lg bg-orange-500 py-3 text-sm font-bold uppercase tracking-widest text-white shadow-md">
+<span class="material-symbols-outlined mr-2">local_shipping</span>
+                    In Delivery
+                </span>
+</div>
+</div>
+<!-- Timeline Stepper -->
+<div class="p-6">
+<h3 class="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">Order Status</h3>
+<div class="relative flex flex-col gap-6 pl-8">
+<!-- Line -->
+<div class="absolute left-[11px] top-2 h-[80%] w-0.5 bg-slate-200 dark:bg-white/10"></div>
+<!-- Step 1 -->
+<div class="relative">
+<div class="absolute -left-8 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold">Order Submitted</span>
+<span class="text-xs text-slate-500">Aug 10, 09:45 AM</span>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative">
+<div class="absolute -left-8 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold">Order Approved</span>
+<span class="text-xs text-slate-500">Aug 10, 02:30 PM</span>
+</div>
+</div>
+<!-- Step 3 (Active) -->
+<div class="relative">
+<div class="absolute -left-8 top-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-orange-500 bg-white dark:bg-background-dark text-orange-500">
+<span class="h-2 w-2 rounded-full bg-orange-500"></span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-orange-600">In Delivery</span>
+<span class="text-xs text-slate-500">Expected by Aug 14</span>
+</div>
+</div>
+<!-- Step 4 (Pending) -->
+<div class="relative opacity-40">
+<div class="absolute -left-8 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 dark:bg-white/10 text-slate-400">
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium">Delivered</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Items List -->
+<div class="mx-4 rounded-xl bg-white dark:bg-slate-900/50 p-4 shadow-sm">
+<h3 class="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">Items Ordered</h3>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-3">
+<div class="flex flex-col">
+<span class="text-sm font-bold">Urea Fertilizer</span>
+<span class="text-xs text-slate-500">Qty Requested: 100kg</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">$600.00</span>
+<span class="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">Approved: 80kg</span>
+</div>
+</div>
+<div class="flex justify-between">
+<div class="flex flex-col">
+<span class="text-sm font-bold">Paddy Seeds (Premium)</span>
+<span class="text-xs text-slate-500">Qty Requested: 5 bags</span>
+</div>
+<div class="flex flex-col items-end text-right">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">$550.00</span>
+<span class="text-[10px] text-slate-500">Approved: 5 bags</span>
+</div>
+</div>
+</div>
+<div class="mt-4 border-t border-slate-100 dark:border-white/5 pt-3">
+<div class="flex justify-between text-lg font-black">
+<span>Total Amount</span>
+<span class="text-primary">$1,150.00</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="p-6">
+<button class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 text-sm font-bold text-white shadow-lg active:scale-[0.98]">
+<span class="material-symbols-outlined">map</span>
+                Track Delivery
+            </button>
+</div>
+</div>
+<!-- Reject Example with Red Reason Card (Demo overlay) -->
+<div class="relative mx-auto mt-10 min-h-screen max-w-md bg-background-light dark:bg-background-dark pb-24 shadow-2xl overflow-hidden rounded-t-3xl">
+<div class="bg-white dark:bg-background-dark p-6 shadow-sm">
+<div class="flex items-center gap-2 text-slate-500 mb-2">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span class="text-sm font-medium">Order Detail</span>
+</div>
+<h2 class="text-2xl font-black text-slate-900 dark:text-slate-100">#FIDS-2024-0612</h2>
+<div class="mt-4">
+<span class="inline-flex w-full items-center justify-center rounded-lg bg-red-600 py-3 text-sm font-bold uppercase tracking-widest text-white shadow-md">
+<span class="material-symbols-outlined mr-2">cancel</span>
+                    Rejected
+                </span>
+</div>
+</div>
+<div class="p-4">
+<div class="rounded-xl border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 p-4">
+<div class="flex items-center gap-2 text-red-700 dark:text-red-400 mb-1">
+<span class="material-symbols-outlined text-sm">info</span>
+<span class="text-xs font-bold uppercase">Rejection Reason</span>
+</div>
+<p class="text-sm font-medium text-red-800 dark:text-red-300">
+                    Requested pesticide "Alpha-Z" is currently out of stock and not permitted for distribution in your specific soil zone (Zone B). Please consult with your local supervisor.
+                </p>
+</div>
+</div>
+<div class="p-6">
+<button class="w-full rounded-xl border-2 border-slate-300 dark:border-white/20 py-4 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50">
+                Contact Support
+            </button>
+</div>
+</div>
+<!-- Confirmation Dialog Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-sm">
+<div class="w-full max-w-xs rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-2xl">
+<div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 text-red-600">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">Cancel order #FIDS-2024-0892?</h3>
+<p class="mt-2 text-sm text-slate-500 dark:text-slate-400">This action cannot be undone. Your request will be removed from the processing queue.</p>
+<div class="mt-6 flex flex-col gap-3">
+<button class="w-full rounded-lg bg-red-600 py-3 text-sm font-bold text-white shadow-sm active:bg-red-700">Yes, Cancel Order</button>
+<button class="w-full rounded-lg border border-slate-200 dark:border-white/10 bg-transparent py-3 text-sm font-bold text-slate-600 dark:text-slate-300">Keep Order</button>
+</div>
+</div>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

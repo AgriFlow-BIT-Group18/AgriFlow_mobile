@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgriFlow AI Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2D6A4F",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex h-screen flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl relative overflow-hidden">
+<!-- Header -->
+<header class="flex items-center gap-4 p-4 border-b border-primary/10 bg-white dark:bg-background-dark sticky top-0 z-10">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 transition-colors text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold leading-tight">AgriFlow AI Assistant</h1>
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Online • AI Expert</span>
+</div>
+</div>
+</header>
+<!-- Chat Area -->
+<main class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- AI Message -->
+<div class="flex items-start gap-3">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white">smart_toy</span>
+</div>
+<div class="flex flex-col gap-2 max-w-[85%]">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl rounded-tl-none shadow-sm border border-primary/5">
+<p class="text-sm leading-relaxed">
+                            Hello! I am your AgriFlow AI. I can help you with crop diagnosis, planting advice based on weather, or checking latest market price trends.
+                        </p>
+</div>
+<span class="text-[10px] text-slate-400 px-1 uppercase tracking-wider font-semibold">AgriFlow AI • Just now</span>
+</div>
+</div>
+<!-- User Message Example -->
+<div class="flex items-start gap-3 flex-row-reverse">
+<div class="size-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="User profile picture in circular frame" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJOoF_6urcMRTEFGX_MuWND4X4msAf2LkkHkWSb_7YBNhUAckbZ7a_Wq5wRjqdKrM7Il1VABcfmfINFgDpjO7BqM9gKGke8vDzkqt4S5YgXeEpQ0q3O83c7DJ49erodvwl5HM-WoRCvDMBH7Shh4xvoMU9l7DP3mPPklxotygqrkbPbjqpVK_DqmkiXFJw05gf_qj1nM8y0oq-n-LrnQutnamDVlMAeMG-BUQlHnyTOy4KQWh5YjflNi9wxWK6-iLO2YfxjX81Qvy_"/>
+</div>
+<div class="flex flex-col gap-2 items-end max-w-[85%]">
+<div class="bg-primary text-white p-4 rounded-xl rounded-tr-none shadow-md">
+<p class="text-sm leading-relaxed">
+                            What are the current fertilizer prices in West Africa?
+                        </p>
+</div>
+<span class="text-[10px] text-slate-400 px-1 uppercase tracking-wider font-semibold">You • 2m ago</span>
+</div>
+</div>
+<!-- AI Response Example with Data -->
+<div class="flex items-start gap-3">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white">smart_toy</span>
+</div>
+<div class="flex flex-col gap-3 max-w-[85%] w-full">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl rounded-tl-none shadow-sm border border-primary/5">
+<p class="text-sm leading-relaxed mb-3">
+                            Here are the current average XOF prices for fertilizers in the region:
+                        </p>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-2 rounded bg-primary/5 border border-primary/10">
+<span class="text-xs font-medium">NPK 15-15-15</span>
+<span class="text-xs font-bold text-primary">24,500 XOF</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-primary/5 border border-primary/10">
+<span class="text-xs font-medium">Urea (46% N)</span>
+<span class="text-xs font-bold text-primary">28,000 XOF</span>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-slate-400 px-1 uppercase tracking-wider font-semibold">AgriFlow AI • 1m ago</span>
+</div>
+</div>
+<!-- Features Quick Access -->
+<div class="grid grid-cols-3 gap-2 py-2">
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-800 border border-primary/10 hover:border-primary transition-all group">
+<span class="material-symbols-outlined text-primary mb-1">photo_camera</span>
+<span class="text-[10px] font-bold text-center">Diagnose</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-800 border border-primary/10 hover:border-primary transition-all group">
+<span class="material-symbols-outlined text-primary mb-1">cloud_sync</span>
+<span class="text-[10px] font-bold text-center">Weather</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-800 border border-primary/10 hover:border-primary transition-all group">
+<span class="material-symbols-outlined text-primary mb-1">trending_up</span>
+<span class="text-[10px] font-bold text-center">Markets</span>
+</button>
+</div>
+</main>
+<!-- Footer / Input Section -->
+<footer class="p-4 bg-white dark:bg-background-dark border-t border-primary/10 space-y-4 pb-8">
+<!-- Suggestion Chips -->
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors">
+                    Diagnose a plant
+                </button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors">
+                    Best time to plant maize?
+                </button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors">
+                    XOF Fertilizer Prices
+                </button>
+</div>
+<!-- Input Bar -->
+<div class="flex items-center gap-2">
+<div class="flex-1 flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-1.5 border border-transparent focus-within:border-primary/50 transition-all">
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2" placeholder="Ask AgriFlow AI..." type="text"/>
+<button class="text-primary/60 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+<button class="size-11 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</footer>
+<!-- Bottom Navigation Bar (Optional Context) -->
+<nav class="flex justify-around items-center py-2 px-4 bg-white dark:bg-background-dark border-t border-primary/5">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">smart_toy</span>
+<span class="text-[10px] font-bold">AI Assistant</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-[10px] font-medium">Markets</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</nav>
+</div>
+<!-- Hidden utilities for layout -->
+<style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .fill-1 {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</body></html>

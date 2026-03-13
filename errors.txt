@@ -1,0 +1,338 @@
+﻿
+  error - The getter 
+'monitoring' isn't defined 
+for the type 'Icons' - lib\
+screens\ai_assistant_screen
+.dart:235:50 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\ai_assistant_screen.da
+rt:363:27 - 
+undefined_getter
+  error - Invalid constant 
+value - lib\screens\deliver
+y_tracking_screen.dart:63:4
+8 - invalid_constant
+  error - The getter 
+'black05' isn't defined 
+for the type 'Colors' - lib
+\screens\delivery_tracking_
+screen.dart:63:55 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:91:57 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:118:53 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:132:57 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:168:43 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:269:55 - 
+undefined_getter
+  error - Arguments of a 
+constant creation must be 
+constant expressions - lib\
+screens\delivery_tracking_s
+creen.dart:340:37 - const_w
+ith_non_constant_argument
+  error - The getter 
+'home_pin' isn't defined 
+for the type 'Icons' - lib\
+screens\delivery_tracking_s
+creen.dart:340:43 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:439:51 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:521:27 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:563:60 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:580:26 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:602:41 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\delivery_tracking_scre
+en.dart:602:65 - 
+undefined_getter
+  error - Invalid constant 
+value - lib\screens\farmer_
+onboarding_screen.dart:142:
+48 - invalid_constant
+  error - The getter 
+'black05' isn't defined 
+for the type 'Colors' - lib
+\screens\farmer_onboarding_
+screen.dart:142:55 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\farmer_onboarding_scre
+en.dart:164:51 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\farmer_onboarding_scre
+en.dart:174:53 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\farmer_onboarding_scre
+en.dart:200:43 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\farmer_onboarding_scre
+en.dart:233:40 - 
+undefined_getter
+  error - Invalid constant 
+value - lib\screens\farmer_
+profile_screen.dart:198:48 
+- invalid_constant
+  error - The getter 
+'black05' isn't defined 
+for the type 'Colors' - lib
+\screens\farmer_profile_scr
+een.dart:198:55 - 
+undefined_getter
+  error - Invalid constant 
+value - lib\screens\farmer_
+profile_screen.dart:576:34 
+- invalid_constant
+  error - The getter 
+'black05' isn't defined 
+for the type 'Colors' - lib
+\screens\farmer_profile_scr
+een.dart:576:41 - 
+undefined_getter
+  error - The class 
+'EdgeInsets' doesn't have 
+a constant constructor 
+'bottom' - lib\screens\logi
+n_screen.dart:83:50 - const
+_with_undefined_constructor
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\login_screen.dart:250:
+65 - undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\login_screen.dart:257:
+47 - undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\login_screen.dart:261:
+65 - undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:35:31 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:39:61 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:139:56 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:166:60 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:171:51 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:195:42 - 
+undefined_getter
+  error - Invalid constant 
+value - lib\screens\order_h
+istory_screen.dart:196:44 
+- invalid_constant
+  error - The getter 
+'black05' isn't defined 
+for the type 'Colors' - lib
+\screens\order_history_scre
+en.dart:196:51 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:214:48 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\order_history_screen.d
+art:287:63 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\product_catalogue_scre
+en.dart:66:47 - 
+undefined_getter
+  error - The getter 
+'potted_plant' isn't 
+defined for the type 
+'Icons' - lib\screens\produ
+ct_catalogue_screen.dart:26
+4:47 - undefined_getter
+  error - Invalid constant 
+value - lib\screens\product
+_catalogue_screen.dart:558:
+44 - invalid_constant
+  error - The getter 
+'black05' isn't defined 
+for the type 'Colors' - lib
+\screens\product_catalogue_
+screen.dart:558:51 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\product_catalogue_scre
+en.dart:620:58 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\product_catalogue_scre
+en.dart:639:62 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:205:49 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:221:47 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:292:64 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:296:64 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:306:64 - 
+undefined_getter
+  error - Invalid constant 
+value - lib\screens\shoppin
+g_cart_screen.dart:398:44 
+- invalid_constant
+  error - The getter 
+'black05' isn't defined 
+for the type 'Colors' - lib
+\screens\shopping_cart_scre
+en.dart:398:51 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:409:31 - 
+undefined_getter
+  error - Invalid constant 
+value - lib\screens\shoppin
+g_cart_screen.dart:414:24 
+- invalid_constant
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:414:31 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:480:37 - 
+undefined_getter
+  error - The getter 
+'slate' isn't defined for 
+the type 'Colors' - lib\scr
+eens\shopping_cart_screen.d
+art:570:25 - 
+undefined_getter
+
+
