@@ -113,6 +113,16 @@ class ApiService {
     throw Exception('Failed to load deliveries');
   }
 
+  Future<List<dynamic>> getMyDeliveries() async {
+    final token = await _getToken();
+    final response = await http.get(
+      Uri.parse('$_baseUrl/deliveries/my-deliveries'),
+      headers: _headers(token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to load my deliveries');
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
