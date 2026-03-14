@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
-import 'product_catalogue_screen.dart';
+import '../widgets/main_layout.dart';
 
 class FarmerOnboardingScreen extends StatefulWidget {
   const FarmerOnboardingScreen({super.key});
@@ -281,8 +281,7 @@ class _FarmerOnboardingScreenState extends State<FarmerOnboardingScreen> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const ProductCatalogueScreen(),
+                                builder: (context) => const MainLayout(),
                               ),
                             );
                           },

@@ -69,7 +69,8 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context)),
+                      const SizedBox(width: 48), // Spacer for centering title
+
                       const Text('My Profile', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                       const Icon(Icons.settings, color: Colors.white),
                     ],

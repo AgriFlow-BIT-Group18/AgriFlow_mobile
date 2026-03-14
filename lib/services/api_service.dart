@@ -93,6 +93,26 @@ class ApiService {
     throw Exception('Failed to load orders');
   }
 
+  Future<List<dynamic>> getAllOrders() async {
+    final token = await _getToken();
+    final response = await http.get(
+      Uri.parse('$_baseUrl/orders'),
+      headers: _headers(token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to load all orders');
+  }
+
+  Future<List<dynamic>> getDeliveries() async {
+    final token = await _getToken();
+    final response = await http.get(
+      Uri.parse('$_baseUrl/deliveries'),
+      headers: _headers(token),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to load deliveries');
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');

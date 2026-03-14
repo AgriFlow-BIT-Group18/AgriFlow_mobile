@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'product_catalogue_screen.dart';
+import '../widgets/main_layout.dart';
 import '../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ProductCatalogueScreen()),
+          MaterialPageRoute(builder: (context) => const MainLayout()),
         );
       }
     } catch (e) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'farmer_profile_screen.dart';
-import 'product_catalogue_screen.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
@@ -15,6 +15,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   List<dynamic> _orders = [];
   bool _isLoading = true;
   String _selectedFilter = 'All';
+  String _userRole = 'farmer';
 
   @override
   void initState() {
@@ -25,7 +26,16 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   Future<void> _fetchOrders() async {
     setState(() => _isLoading = true);
     try {
-      final orders = await _apiService.getMyOrders();
+      final prefs = await SharedPreferences.getInstance();
+      final userStr = prefs.getString('user');
+      if (userStr != null) {
+        final user = jsonDecode(userStr);
+        _userRole = (user['role'] ?? 'farmer').toString().toLowerCase();
+      }
+
+      final orders = _userRole == 'distributor' || _userRole == 'admin'
+          ? await _apiService.getAllOrders()
+          : await _apiService.getMyOrders();
       setState(() => _orders = orders);
     } catch (e) {
       if (mounted) {
@@ -65,6 +75,90 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     }
   }
 
+  void _showOrderDetails(dynamic order) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Order Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+              ],
+            ),
+            const Divider(),
+            const SizedBox(height: 16),
+            Text('Order ID: ${(order['_id'] ?? '').toString().toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2D6C50))),
+            const SizedBox(height: 8),
+            Text('Placed on: ${order['createdAt'] != null ? DateTime.parse(order['createdAt']).toLocal().toString().substring(0, 16) : ''}'),
+            const SizedBox(height: 24),
+            const Text('Items', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.separated(
+                itemCount: (order['orderItems'] as List).length,
+                separatorBuilder: (_, __) => const Divider(height: 24),
+                itemBuilder: (context, i) {
+                  final item = order['orderItems'][i];
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(item['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text('Qty: ${item['qty']} @ ${item['price']} FCFA'),
+                        ],
+                      ),
+                      Text('${((item['qty'] ?? 0) * (item['price'] ?? 0)).toStringAsFixed(0)} FCFA', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  );
+                },
+              ),
+            ),
+            const Divider(thickness: 2),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Amount', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('${(order['totalPrice'] ?? 0).toStringAsFixed(0)} FCFA', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF2D6C50))),
+                ],
+              ),
+            ),
+            if ((order['status'] ?? '').toLowerCase() == 'delivery')
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // We would ideally tell MainLayout to switch to tab 3
+                  // For now, let's just push it on top or rely on the user switching tabs
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2D6C50),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 56),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Track Delivery', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,11 +166,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('My Orders', style: TextStyle(color: Color(0xFF0F172A), fontSize: 20, fontWeight: FontWeight.bold)),
+        automaticallyImplyLeading: false,
+
+        title: Text(_userRole == 'distributor' || _userRole == 'admin' ? 'All Orders' : 'My Orders', 
+          style: const TextStyle(color: Color(0xFF0F172A), fontSize: 20, fontWeight: FontWeight.bold)),
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _fetchOrders, color: const Color(0xFF2D6C50)),
         ],
@@ -147,64 +240,50 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                             final id = (order['_id'] ?? '').toString().toUpperCase();
                             final shortId = id.length >= 8 ? id.substring(id.length - 8) : id;
 
-                            return Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('#$shortId', style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold)),
-                                      Text(date, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(items, style: const TextStyle(fontSize: 14, color: Color(0xFF334155)), maxLines: 2, overflow: TextOverflow.ellipsis),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                        decoration: BoxDecoration(color: _statusBg(status), borderRadius: BorderRadius.circular(12)),
-                                        child: Text(
-                                          status.toUpperCase(),
-                                          style: TextStyle(color: _statusColor(status), fontSize: 11, fontWeight: FontWeight.bold),
+                            return GestureDetector(
+                              onTap: () => _showOrderDetails(order),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('#$shortId', style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold)),
+                                        Text(date, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(items, style: const TextStyle(fontSize: 14, color: Color(0xFF334155)), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                          decoration: BoxDecoration(color: _statusBg(status), borderRadius: BorderRadius.circular(12)),
+                                          child: Text(
+                                            status.toUpperCase(),
+                                            style: TextStyle(color: _statusColor(status), fontSize: 11, fontWeight: FontWeight.bold),
+                                          ),
                                         ),
-                                      ),
-                                      Text('${total.toStringAsFixed(0)} FCFA', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                    ],
-                                  ),
-                                ],
+                                        Text('${total.toStringAsFixed(0)} FCFA', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },
                         ),
                       ),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        selectedItemColor: const Color(0xFF2D6C50),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          if (index == 0) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProductCatalogueScreen()));
-          if (index == 4) Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmerProfileScreen()));
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Catalogue'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Orders'),
-          BottomNavigationBarItem(icon: Icon(Icons.local_shipping), label: 'Delivery'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

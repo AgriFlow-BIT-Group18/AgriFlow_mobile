@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'farmer_profile_screen.dart';
-import 'order_history_screen.dart';
 import 'shopping_cart_screen.dart';
 import '../services/api_service.dart';
 
@@ -183,23 +181,6 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
                 child: Text('${CartService().count}', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
               ),
             ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: const Color(0xFF2D6C50),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderHistoryScreen()));
-          if (index == 4) Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmerProfileScreen()));
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Catalogue'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Orders'),
-          BottomNavigationBarItem(icon: Icon(Icons.local_shipping), label: 'Delivery'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
