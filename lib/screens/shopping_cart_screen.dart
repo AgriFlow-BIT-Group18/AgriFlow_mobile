@@ -95,10 +95,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
       final prefs = await SharedPreferences.getInstance();
       final userStr = prefs.getString('user');
-      String region = 'Dakar';
+      String region = '';
       if (userStr != null) {
         final user = jsonDecode(userStr);
-        region = user['region'] ?? 'Dakar';
+        region = user['region'] ?? '';
       }
 
       await _apiService.createOrder(

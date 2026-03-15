@@ -84,7 +84,7 @@ class _DistributorMapScreenState extends State<DistributorMapScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('Showing distributors near', style: TextStyle(color: Colors.grey, fontSize: 14)),
-          const Text('Dakar, Senegal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF2D6C50))),
+          const Text('Your Location', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF2D6C50))),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
