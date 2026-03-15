@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
+import 'farmer_settings_screen.dart';
 import '../services/api_service.dart';
+import '../services/translation_service.dart';
 
 
 class FarmerProfileScreen extends StatefulWidget {
@@ -14,15 +16,21 @@ class FarmerProfileScreen extends StatefulWidget {
 
 class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   final ApiService _apiService = ApiService();
+  final TranslationService _translationService = TranslationService();
   String _userName = 'Kofi Mensah';
   String _userEmail = 'kofi.mensah@gmail.com';
   String _userPhone = '+233 24 000 0001';
-  String _userRegion = 'Ashanti Region';
+  String _userCountry = 'Burkina Faso';
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await _translationService.init();
+    await _loadUserData();
   }
 
   Future<void> _loadUserData() async {
@@ -34,7 +42,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
         _userName = user['name'] ?? 'Farmer';
         _userEmail = user['email'] ?? '';
         _userPhone = user['phone'] ?? '';
-        _userRegion = user['region'] ?? 'Senegal';
+        _userCountry = user['region'] ?? 'Burkina Faso';
       });
     }
   }
@@ -71,15 +79,23 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                     children: [
                       const SizedBox(width: 48), // Spacer for centering title
 
-                      const Text('My Profile', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      const Icon(Icons.settings, color: Colors.white),
+                      Text(_translationService.translate('my_profile'), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: const Icon(Icons.settings, color: Colors.white),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const FarmerSettingsScreen()),
+                          ).then((_) => _initData());
+                        },
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   const CircleAvatar(radius: 40, backgroundColor: Colors.white, child: Icon(Icons.person, size: 50, color: Color(0xFF2D6C50))),
                   const SizedBox(height: 12),
                   Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                  Text('Farmer · $_userRegion', style: const TextStyle(color: Colors.white70)),
+                  Text('${_translationService.translate('profile')} · $_userCountry', style: const TextStyle(color: Colors.white70)),
                 ],
               ),
             ),
@@ -89,11 +105,11 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _buildInfoCard('Account Info', [
-                    _buildInfoRow('Full Name', _userName),
-                    _buildInfoRow('Email', _userEmail),
-                    _buildInfoRow('Phone', _userPhone),
-                    _buildInfoRow('Region', _userRegion),
+                  _buildInfoCard(_translationService.translate('account_info'), [
+                    _buildInfoRow(_translationService.translate('full_name'), _userName),
+                    _buildInfoRow(_translationService.translate('email'), _userEmail),
+                    _buildInfoRow(_translationService.translate('phone_number'), _userPhone),
+                    _buildInfoRow(_translationService.translate('country'), _userCountry),
                   ]),
                   const SizedBox(height: 24),
                   ElevatedButton(
@@ -105,7 +121,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(_translationService.translate('sign_out'), style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

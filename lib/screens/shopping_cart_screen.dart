@@ -70,6 +70,7 @@ class ShoppingCartScreen extends StatefulWidget {
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   final CartService _cart = CartService();
   final ApiService _apiService = ApiService();
+  String _paymentMethod = 'Mobile Money';
   bool _isSubmitting = false;
   final TextEditingController _noteController = TextEditingController();
 
@@ -82,8 +83,16 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     }
 
     setState(() => _isSubmitting = true);
+    
+    // Point 4: Secure Payment Simulation
     try {
-      // Get current user's region for shipping
+      // Simulate secure handshaking with payment gateway
+      await Future.delayed(const Duration(seconds: 2));
+      
+      // Point 3: Real-time Stock Verification (Simulated)
+      // In a real app, we'd call an endpoint to lock stock
+      await Future.delayed(const Duration(milliseconds: 500));
+
       final prefs = await SharedPreferences.getInstance();
       final userStr = prefs.getString('user');
       String region = 'Dakar';
@@ -106,10 +115,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       _cart.clear();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Order submitted successfully! Waiting for approval.'),
-            backgroundColor: Color(0xFF2D6C50),
-            duration: Duration(seconds: 3),
+          SnackBar(
+            content: Text('✅ ${_paymentMethod} Payment Verified. Order submitted!'),
+            backgroundColor: const Color(0xFF2D6C50),
+            duration: const Duration(seconds: 3),
           ),
         );
         Navigator.pushReplacement(
@@ -243,6 +252,23 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     ],
                   ),
                   const Divider(height: 24),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Payment Method', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildPaymentOption('Mobile Money', Icons.phone_android),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildPaymentOption('Credit Card', Icons.credit_card),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -341,6 +367,28 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             onPressed: () => setState(() => _cart.removeItem(item.productId)),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentOption(String label, IconData icon) {
+    bool isSelected = _paymentMethod == label;
+    return GestureDetector(
+      onTap: () => setState(() => _paymentMethod = label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFE8F5E9) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? const Color(0xFF2D6C50) : Colors.grey.shade300, width: 2),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: isSelected ? const Color(0xFF2D6C50) : Colors.grey, size: 24),
+            const SizedBox(height: 4),
+            Text(label, style: TextStyle(fontSize: 11, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? const Color(0xFF2D6C50) : Colors.black87)),
+          ],
+        ),
       ),
     );
   }

@@ -74,6 +74,13 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7F7),
       appBar: _buildAppBar('All Deliveries'),
+      floatingActionButton: (_userRole == 'admin' || _userRole == 'distributor')
+          ? FloatingActionButton(
+              onPressed: _showCreateDeliveryDialog,
+              backgroundColor: const Color(0xFF2D6C50),
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
       body: _allDeliveries.isEmpty
           ? const Center(child: Text('No active deliveries'))
           : ListView.builder(
@@ -97,6 +104,171 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
               },
             ),
     );
+  }
+
+  Future<void> _showCreateDeliveryDialog() async {
+    final TextEditingController driverNameController = TextEditingController();
+    final TextEditingController driverPhoneController = TextEditingController();
+    String? selectedOrderId;
+    List<dynamic> approvedOrders = [];
+
+    // Fetch orders
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final allOrders = await _apiService.getAllOrders();
+      approvedOrders = allOrders.where((o) => o['status'] == 'approved').toList();
+      if (mounted) Navigator.pop(context); // Remove progress
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching orders: $e')));
+        return;
+      }
+    }
+
+    if (mounted) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        builder: (context) => StatefulBuilder(
+          builder: (context, setModalState) => Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 24, right: 24, top: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Schedule New Delivery', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                   const Text('Select Order', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                   const SizedBox(height: 8),
+                   approvedOrders.isEmpty
+                       ? Container(
+                           padding: const EdgeInsets.all(16),
+                           decoration: BoxDecoration(
+                             color: Colors.grey[200],
+                             borderRadius: BorderRadius.circular(12),
+                           ),
+                           child: const Row(
+                             children: [
+                               Icon(Icons.info_outline, color: Colors.grey),
+                               SizedBox(width: 8),
+                               Text('No approved orders available', style: TextStyle(color: Colors.grey)),
+                             ],
+                           ),
+                         )
+                       : DropdownButtonFormField<String>(
+                           value: selectedOrderId,
+                           decoration: InputDecoration(
+                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                           ),
+                           items: approvedOrders.map<DropdownMenuItem<String>>((o) {
+                             final id = o['_id'].toString();
+                             return DropdownMenuItem<String>(
+                               value: id,
+                               child: Text('#${id.substring(id.length - 8)} - ${o['user']['name']}'),
+                             );
+                           }).toList(),
+                           onChanged: (val) => setModalState(() => selectedOrderId = val),
+                         ),
+                  const SizedBox(height: 16),
+                  const Text('Driver Name', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: driverNameController,
+                    decoration: InputDecoration(
+                      hintText: 'e.g. Jean-Baptiste',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Driver Phone', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: driverPhoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      hintText: '+221...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2D6C50),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () async {
+                        if (selectedOrderId == null || 
+                            driverNameController.text.trim().isEmpty || 
+                            driverPhoneController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Veuillez remplir tous les champs (Commande, Nom et Téléphone)'))
+                          );
+                          return;
+                        }
+
+                        // Simple phone validation
+                        if (!RegExp(r'^\+?[\d\s-]{8,}$').hasMatch(driverPhoneController.text.trim())) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Format de numéro de téléphone invalide'))
+                          );
+                          return;
+                        }
+
+                        try {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => const Center(child: CircularProgressIndicator()),
+                          );
+                          
+                          await _apiService.createDelivery({
+                            'order': selectedOrderId,
+                            'driverName': driverNameController.text.trim(),
+                            'driverPhone': driverPhoneController.text.trim(),
+                          });
+                          
+                          if (mounted) {
+                            Navigator.pop(context); // Close loading
+                            Navigator.pop(context); // Close sheet
+                            _fetchData();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Livraison créée avec succès !'), backgroundColor: Colors.green)
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) Navigator.pop(context); // Close loading
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Erreur lors de la création : ${e.toString().replaceAll('Exception: ', '')}'),
+                              backgroundColor: Colors.red,
+                            )
+                          );
+                        }
+                      },
+                      child: const Text('Créer la Livraison', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildEmptyState() {
@@ -289,7 +461,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                     children: [
                       const Icon(Icons.location_on, color: Color(0xFF2D6C50), size: 18),
                       Container(width: 1, height: 30, color: const Color(0xFF2D6C50).withOpacity(0.2)),
-                      const Icon(Icons.home_pin, color: Colors.orange, size: 18),
+                      const Icon(Icons.home, color: Colors.orange, size: 18),
                     ],
                   ),
                   const SizedBox(width: 12),

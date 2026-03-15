@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'dart:async';
 import 'shopping_cart_screen.dart';
+import 'product_details_screen.dart';
+import 'notification_screen.dart';
 import '../services/api_service.dart';
 
 class ProductCatalogueScreen extends StatefulWidget {
@@ -13,20 +17,65 @@ class ProductCatalogueScreen extends StatefulWidget {
 
 class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
   final ApiService _apiService = ApiService();
+  final AudioPlayer _audioPlayer = AudioPlayer();
   List<dynamic> _products = [];
   bool _isLoading = true;
   String _userName = 'Farmer';
+  String _userCountry = 'Burkina Faso';
   String _selectedCategory = 'All';
+  int _unreadCount = 0;
+  Timer? _pollingTimer;
 
   @override
   void initState() {
     super.initState();
     _loadInitialData();
+    _startNotificationPolling();
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  void _startNotificationPolling() {
+    // Poll every 10 seconds for new notifications
+    _pollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      try {
+        final newCount = await _apiService.getUnreadNotificationCount();
+        if (newCount > _unreadCount) {
+          // Play sound - using a reliable external URL for a notification ping
+          await _audioPlayer.play(UrlSource('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'));
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('New notification! 🔔'),
+                backgroundColor: Color(0xFF2D6C50),
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+        }
+        if (mounted) {
+          setState(() {
+            _unreadCount = newCount;
+          });
+        }
+      } catch (e) {
+        // Silent error for polling
+      }
+    });
   }
 
   Future<void> _loadInitialData() async {
     await _loadUserData();
     await _fetchProducts();
+    // Also get initial unread count
+    final count = await _apiService.getUnreadNotificationCount();
+    if (mounted) setState(() => _unreadCount = count);
   }
 
   Future<void> _loadUserData() async {
@@ -36,6 +85,7 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
       final user = jsonDecode(userStr);
       setState(() {
         _userName = user['name'] ?? 'Farmer';
+        _userCountry = user['region'] ?? 'Burkina Faso';
       });
     }
   }
@@ -92,16 +142,56 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
                               color: Color(0xFF0F172A),
                             ),
                           ),
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.location_on, color: Color(0xFF2D6C50), size: 14),
-                              SizedBox(width: 4),
-                              Text('Dakar, Senegal', style: TextStyle(fontSize: 12)),
+                              const Icon(Icons.location_on, color: Color(0xFF2D6C50), size: 14),
+                              const SizedBox(width: 4),
+                              Text(_userCountry, style: const TextStyle(fontSize: 12)),
                             ],
                           ),
                         ],
                       ),
-                      const Icon(Icons.notifications_outlined, color: Color(0xFF2D6C50)),
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.notifications_outlined, color: Color(0xFF2D6C50)),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const NotificationScreen()),
+                            ).then((_) {
+                              // Refresh unread count when returning from notification screen
+                              _apiService.getUnreadNotificationCount().then((count) {
+                                if (mounted) setState(() => _unreadCount = count);
+                              });
+                            }),
+                          ),
+                          if (_unreadCount > 0)
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '$_unreadCount',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -168,6 +258,7 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
       floatingActionButton: Stack(
         children: [
           FloatingActionButton(
+            heroTag: 'cart_fab',
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShoppingCartScreen())).then((_) => setState(() {})),
             backgroundColor: const Color(0xFF2D6C50),
             child: const Icon(Icons.shopping_cart, color: Colors.white),
@@ -219,66 +310,91 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
 
   Widget _buildProductCard(dynamic product) {
     final inStock = (product['stockQuantity'] ?? 0) > 0;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProductDetailsScreen(product: product),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Container(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Hero(
+                  tag: 'product_${product['_id']}',
+                  child: product['imageUrl'] != null && product['imageUrl'].toString().isNotEmpty
+                    ? (product['imageUrl'].toString().startsWith('assets/')
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(product['imageUrl'], fit: BoxFit.cover),
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              product['imageUrl'],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey),
+                            ),
+                          ))
+                    : const Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(product['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+            Text(product['unit'] ?? 'unit', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Container(width: 8, height: 8, decoration: BoxDecoration(color: inStock ? Colors.green : Colors.red, shape: BoxShape.circle)),
+                const SizedBox(width: 4),
+                Text(inStock ? 'In Stock' : 'Out of Stock', style: const TextStyle(fontSize: 10)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text('${product['price']} FCFA', style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold, fontSize: 14)),
+            const SizedBox(height: 8),
+            SizedBox(
               width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
+              child: OutlinedButton(
+                onPressed: inStock
+                    ? () {
+                        CartService().addItem(product);
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${product['name']} added to cart'),
+                            duration: const Duration(seconds: 1),
+                            backgroundColor: const Color(0xFF2D6C50),
+                          ),
+                        );
+                      }
+                    : null,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF2D6C50),
+                  side: const BorderSide(color: Color(0xFF2D6C50)),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text('Add to Cart', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
               ),
-              child: const Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(product['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
-          Text(product['unit'] ?? 'unit', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Container(width: 8, height: 8, decoration: BoxDecoration(color: inStock ? Colors.green : Colors.red, shape: BoxShape.circle)),
-              const SizedBox(width: 4),
-              Text(inStock ? 'In Stock' : 'Out of Stock', style: const TextStyle(fontSize: 10)),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text('${product['price']} FCFA', style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold, fontSize: 14)),
-          const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: inStock
-                  ? () {
-                      CartService().addItem(product);
-                      setState(() {});
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${product['name']} added to cart'),
-                          duration: const Duration(seconds: 1),
-                          backgroundColor: const Color(0xFF2D6C50),
-                        ),
-                      );
-                    }
-                  : null,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF2D6C50),
-                side: const BorderSide(color: Color(0xFF2D6C50)),
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('Add to Cart', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

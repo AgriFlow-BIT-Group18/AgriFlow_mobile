@@ -1,7 +1,79 @@
 import 'package:flutter/material.dart';
+import '../widgets/main_layout.dart';
+import '../services/ai_service.dart';
 
-class AIAssistantScreen extends StatelessWidget {
+class AIAssistantScreen extends StatefulWidget {
   const AIAssistantScreen({super.key});
+
+  @override
+  State<AIAssistantScreen> createState() => _AIAssistantScreenState();
+}
+
+class _AIAssistantScreenState extends State<AIAssistantScreen> {
+  final TextEditingController _inputController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final AIService _aiService = AIService();
+  
+  final List<Map<String, String>> _messages = [
+    {
+      'role': 'assistant',
+      'content': 'Hello! I am your AgriFlow AI. I can help you with crop diagnosis, planting advice based on weather, or checking latest market price trends.'
+    },
+  ];
+
+  bool _isLoading = false;
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Future<void> _handleSend() async {
+    final text = _inputController.text.trim();
+    print('DEBUG: Sending message: $text');
+    if (text.isEmpty || _isLoading) return;
+
+    setState(() {
+      _messages.add({'role': 'user', 'content': text});
+      _inputController.clear();
+      _isLoading = true;
+    });
+    _scrollToBottom();
+
+    try {
+      print('DEBUG: Requesting completion from AIService...');
+      // Create a history list for the API (only user/assistant roles)
+      final history = _messages.map((m) => {
+        'role': m['role']!,
+        'content': m['content']!,
+      }).toList();
+
+      final response = await _aiService.getChatCompletion(history);
+      print('DEBUG: Received response: ${response.substring(0, 20)}...');
+
+      setState(() {
+        _messages.add({'role': 'assistant', 'content': response});
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('DEBUG: Error in AIAssistantScreen: $e');
+      setState(() {
+        _messages.add({
+          'role': 'assistant',
+          'content': 'Sorry, I encountered an error: ${e.toString()}. Please check your connection and try again.'
+        });
+        _isLoading = false;
+      });
+    }
+    _scrollToBottom();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +88,7 @@ class AIAssistantScreen extends StatelessWidget {
             Icons.arrow_back,
             color: Color(0xFF2D6A4F),
           ), // primary
-          onPressed: () {},
+          onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           children: [
@@ -37,8 +109,7 @@ class AIAssistantScreen extends StatelessWidget {
                       width: 8,
                       height: 8,
                       decoration: const BoxDecoration(
-                        color:
-                            Colors.green, // outline from tailwind bg-green-500
+                        color: Colors.green, // outline from tailwind bg-green-500
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -69,44 +140,30 @@ class AIAssistantScreen extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: ListView(
+              child: ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(16.0),
-                children: [
-                  // AI Welcome Message
-                  _buildAiMessage(
-                    'Hello! I am your AgriFlow AI. I can help you with crop diagnosis, planting advice based on weather, or checking latest market price trends.',
-                    'Just now',
-                  ),
-                  const SizedBox(height: 16),
-
-                  // User Message Example
-                  _buildUserMessage(
-                    'What are the current fertilizer prices in West Africa?',
-                    '2m ago',
-                  ),
-                  const SizedBox(height: 16),
-
-                  // AI Response Example with Data
-                  _buildAiMessageWithData(
-                    'Here are the current average XOF prices for fertilizers in the region:',
-                    [
-                      _DataRow('NPK 15-15-15', '24,500 XOF'),
-                      _DataRow('Urea (46% N)', '28,000 XOF'),
-                    ],
-                    '1m ago',
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Features Quick Access Grid
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildQuickAction(Icons.photo_camera, 'Diagnose'),
-                      _buildQuickAction(Icons.cloud_sync, 'Weather'),
-                      _buildQuickAction(Icons.trending_up, 'Markets'),
-                    ],
-                  ),
-                ],
+                itemCount: _messages.length + (_isLoading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == _messages.length && _isLoading) {
+                    return _buildTypingIndicator();
+                  }
+                  
+                  final message = _messages[index];
+                  final isUser = message['role'] == 'user';
+                  
+                  if (isUser) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildUserMessage(message['content']!, 'Just now'),
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildAiMessage(message['content']!, 'Just now'),
+                    );
+                  }
+                },
               ),
             ),
 
@@ -127,20 +184,21 @@ class AIAssistantScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Suggestion Chips
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: Row(
-                      children: [
-                        _buildSuggestionChip('Diagnose a plant'),
-                        const SizedBox(width: 8),
-                        _buildSuggestionChip('Best time to plant maize?'),
-                        const SizedBox(width: 8),
-                        _buildSuggestionChip('XOF Fertilizer Prices'),
-                      ],
+                  // Suggestion Chips (only show if not loading and no user messages yet)
+                  if (_messages.length <= 1 && !_isLoading)
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: Row(
+                        children: [
+                          _buildSuggestionChip('Diagnose a plant'),
+                          const SizedBox(width: 8),
+                          _buildSuggestionChip('Best time to plant maize?'),
+                          const SizedBox(width: 8),
+                          _buildSuggestionChip('XOF Fertilizer Prices'),
+                        ],
+                      ),
                     ),
-                  ),
 
                   // Input Box
                   Row(
@@ -154,9 +212,11 @@ class AIAssistantScreen extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              const Expanded(
+                              Expanded(
                                 child: TextField(
-                                  decoration: InputDecoration(
+                                  controller: _inputController,
+                                  onSubmitted: (_) => _handleSend(),
+                                  decoration: const InputDecoration(
                                     hintText: 'Ask AgriFlow AI...',
                                     border: InputBorder.none,
                                     isDense: true,
@@ -164,7 +224,7 @@ class AIAssistantScreen extends StatelessWidget {
                                       vertical: 12,
                                     ),
                                   ),
-                                  style: TextStyle(fontSize: 14),
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                               ),
                               IconButton(
@@ -172,11 +232,14 @@ class AIAssistantScreen extends StatelessWidget {
                                 constraints: const BoxConstraints(),
                                 icon: Icon(
                                   Icons.mic,
-                                  color: const Color(
-                                    0xFF2D6A4F,
-                                  ).withValues(alpha: 0.6),
+                                  color: const Color(0xFF2D6A4F).withValues(alpha: 0.6),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  // Voice input feature (to be implemented)
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Voice input coming soon!'))
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -191,21 +254,28 @@ class AIAssistantScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFF2D6A4F,
-                              ).withValues(alpha: 0.3),
+                              color: const Color(0xFF2D6A4F).withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
                           ],
                         ),
                         child: IconButton(
-                          icon: const Icon(
-                            Icons.send,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          onPressed: () {},
+                          icon: _isLoading 
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.send,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                          onPressed: _handleSend,
                         ),
                       ),
                     ],
@@ -226,20 +296,60 @@ class AIAssistantScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem('Home', Icons.home_outlined, false),
-                  _buildNavItem(
-                    'AI Assistant',
-                    Icons.smart_toy,
-                    true,
-                  ), // Active
-                  _buildNavItem('Markets', Icons.insert_chart, false),
-                  _buildNavItem('Profile', Icons.person_outline, false),
+                  _buildNavItem(context, 'Home', Icons.home_outlined, 0),
+                  _buildNavItem(context, 'Products', Icons.grid_view_outlined, 1),
+                  _buildNavItem(context, 'Orders', Icons.receipt_long_outlined, 2),
+                  _buildNavItem(context, 'Profile', Icons.person_outline, 4),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTypingIndicator() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: const BoxDecoration(
+            color: Color(0xFF2D6A4F),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.smart_toy_outlined,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            ),
+            border: Border.all(
+              color: const Color(0xFF2D6A4F).withValues(alpha: 0.05),
+            ),
+          ),
+          child: const Text(
+            'Thinking...',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF64748B),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -303,9 +413,7 @@ class AIAssistantScreen extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(
-          width: 24,
-        ), // Space on the right so message doesn't stretch fully
+        const SizedBox(width: 24),
       ],
     );
   }
@@ -315,7 +423,7 @@ class AIAssistantScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const SizedBox(width: 40), // Space on the left
+        const SizedBox(width: 40),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -347,7 +455,7 @@ class AIAssistantScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF94A3B8), // slate-400
+                    color: Color(0xFF94A3B8),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -363,7 +471,6 @@ class AIAssistantScreen extends StatelessWidget {
             color: Colors.blueGrey.shade200,
             shape: BoxShape.circle,
             image: const DecorationImage(
-              // Using a placeholder icon for the user avatar in Flutter
               image: NetworkImage('https://via.placeholder.com/150'),
               fit: BoxFit.cover,
             ),
@@ -373,197 +480,58 @@ class AIAssistantScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAiMessageWithData(
-    String text,
-    List<_DataRow> data,
-    String time,
-  ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: const BoxDecoration(
+  Widget _buildSuggestionChip(String label) {
+    return GestureDetector(
+      onTap: () {
+        _inputController.text = label;
+        _handleSend();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2D6A4F).withValues(alpha: 0.1),
+          border: Border.all(
+            color: const Color(0xFF2D6A4F).withValues(alpha: 0.2),
+          ),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
             color: Color(0xFF2D6A4F),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.smart_toy_outlined,
-            color: Colors.white,
-            size: 24,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
-                  border: Border.all(
-                    color: const Color(0xFF2D6A4F).withValues(alpha: 0.05),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      text,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF0F172A),
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ...data.map(
-                      (item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF2D6A4F,
-                            ).withValues(alpha: 0.05),
-                            border: Border.all(
-                              color: const Color(
-                                0xFF2D6A4F,
-                              ).withValues(alpha: 0.1),
-                            ),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                item.label,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Text(
-                                item.value,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2D6A4F),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: Text(
-                  'AGRIFLOW AI • ${time.toUpperCase()}',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF94A3B8),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 24),
-      ],
+      ),
     );
   }
 
-  Widget _buildQuickAction(IconData icon, String label) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFF2D6A4F).withValues(alpha: 0.1),
+  Widget _buildNavItem(BuildContext context, String label, IconData icon, int index) {
+    const color = Color(0xFF94A3B8);
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => MainLayout(initialIndex: index)),
+        );
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 4),
+          Text(
+            label.toUpperCase(),
+            style: const TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: const Color(0xFF2D6A4F), size: 24),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
-
-  Widget _buildSuggestionChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D6A4F).withValues(alpha: 0.1),
-        border: Border.all(
-          color: const Color(0xFF2D6A4F).withValues(alpha: 0.2),
-        ),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Color(0xFF2D6A4F),
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(String label, IconData icon, bool isActive) {
-    final color = isActive ? const Color(0xFF2D6A4F) : const Color(0xFF94A3B8);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            color: color,
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DataRow {
-  final String label;
-  final String value;
-  _DataRow(this.label, this.value);
 }
