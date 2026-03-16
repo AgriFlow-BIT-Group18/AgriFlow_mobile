@@ -105,7 +105,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         orderItems: _cart.items.map((i) => i.toJson()).toList(),
         shippingAddress: {
           'address': _noteController.text.isNotEmpty ? _noteController.text : 'Default address',
-          'city': region,
+          'city': region.isNotEmpty ? region : 'Dakar',
           'postalCode': '00000',
           'country': 'Senegal',
         },
