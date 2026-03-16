@@ -11,6 +11,7 @@ class TranslationService {
 
   final Map<String, Map<String, String>> _translations = {
     'en': {
+      'flag': '🇺🇸',
       'settings': 'Settings',
       'profile': 'Profile',
       'security': 'Security',
@@ -32,6 +33,7 @@ class TranslationService {
       'country': 'Country',
     },
     'fr': {
+      'flag': '🇫🇷',
       'settings': 'Paramètres',
       'profile': 'Profil',
       'security': 'Sécurité',
@@ -53,6 +55,7 @@ class TranslationService {
       'country': 'Pays',
     },
     'pt': {
+      'flag': '🇵🇹',
       'settings': 'Configurações',
       'profile': 'Perfil',
       'security': 'Segurança',
@@ -60,6 +63,7 @@ class TranslationService {
       'country': 'País',
     },
     'es': {
+      'flag': '🇪🇸',
       'settings': 'Ajustes',
       'profile': 'Perfil',
       'security': 'Seguridad',
@@ -95,5 +99,9 @@ class TranslationService {
       case 'es': return 'Español';
       default: return code.toUpperCase();
     }
+  }
+
+  String getLanguageFlag(String code) {
+    return _translations[code]?['flag'] ?? '🌐';
   }
 }

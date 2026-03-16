@@ -384,29 +384,71 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Map Placeholder
+            // Vehicle Image / Map Placeholder
             Container(
-              height: 200,
+              height: 220,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF2D6C50).withOpacity(0.1)),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Icon Pulsing
-                  Container(
-                    width: 60, height: 60,
-                    decoration: BoxDecoration(color: const Color(0xFF2D6C50).withOpacity(0.2), shape: BoxShape.circle),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: const BoxDecoration(color: Color(0xFF2D6C50), shape: BoxShape.circle),
-                    child: const Icon(Icons.local_shipping, color: Colors.white, size: 24),
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
                 ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(
+                      'https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=1000&auto=format&fit=crop', // High quality delivery truck
+                      fit: BoxFit.cover,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.1),
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.near_me, color: Color(0xFF2D6C50), size: 14),
+                            SizedBox(width: 6),
+                            Text(
+                              'LIVE TRACKING ACTIVE',
+                              style: TextStyle(
+                                color: Color(0xFF2D6C50),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -527,7 +569,30 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
             // Action Button
             if (status != 'delivered')
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  try {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const Center(child: CircularProgressIndicator()),
+                    );
+                    
+                    await _apiService.updateDeliveryStatus(delivery['_id'].toString(), 'delivered');
+                    
+                    if (mounted) {
+                      Navigator.pop(context); // Close loading
+                      _fetchData(); // Refresh UI
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Delivery marked as completed!'), backgroundColor: Colors.green)
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) Navigator.pop(context); // Close loading
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red)
+                    );
+                  }
+                },
                 icon: const Icon(Icons.verified),
                 label: const Text('Confirm Receipt', style: TextStyle(fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(

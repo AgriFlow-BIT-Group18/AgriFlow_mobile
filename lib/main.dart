@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'screens/ai_assistant_screen.dart';
 import 'screens/delivery_tracking_screen.dart';
@@ -9,7 +10,9 @@ import 'screens/order_history_screen.dart';
 import 'screens/product_catalogue_screen.dart';
 import 'screens/shopping_cart_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
   runApp(const MyApp());
 }
 

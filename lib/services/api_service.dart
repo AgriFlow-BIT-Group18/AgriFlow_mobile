@@ -187,6 +187,21 @@ class ApiService {
     throw Exception(responseData['message'] ?? 'Failed to create delivery');
   }
 
+  Future<Map<String, dynamic>> updateDeliveryStatus(String id, String status, {Map<String, dynamic>? currentLocation}) async {
+    final token = await _getToken();
+    final response = await http.put(
+      Uri.parse('$_baseUrl/deliveries/$id/status'),
+      headers: _headers(token),
+      body: jsonEncode({
+        'status': status,
+        if (currentLocation != null) 'currentLocation': currentLocation,
+      }),
+    );
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode == 200) return responseData;
+    throw Exception(responseData['message'] ?? 'Failed to update delivery status');
+  }
+
   Future<List<dynamic>> getNearbyDistributors(double lat, double lng, {double distance = 10}) async {
     final token = await _getToken();
     final response = await http.get(

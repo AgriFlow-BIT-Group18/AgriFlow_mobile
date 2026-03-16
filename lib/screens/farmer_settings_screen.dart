@@ -161,43 +161,9 @@ class _FarmerSettingsScreenState extends State<FarmerSettingsScreen> {
   }
 
   Widget _buildLanguageTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(_translationService.translate('select_language'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 24),
-          ..._translationService.supportedLocales.map((locale) {
-            bool isSelected = _translationService.currentLocale == locale;
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color: isSelected ? const Color(0xFF2D6C50) : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: isSelected ? const Color(0xFF2D6C50) : Colors.grey.shade200,
-                  child: Text(
-                    locale.toUpperCase(),
-                    style: TextStyle(color: isSelected ? Colors.white : Colors.grey, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                title: Text(_translationService.getLanguageName(locale)),
-                trailing: isSelected ? const Icon(Icons.check_circle, color: Color(0xFF2D6C50)) : null,
-                onTap: () async {
-                  await _translationService.setLocale(locale);
-                  setState(() {});
-                },
-              ),
-            );
-          }),
-        ],
-      ),
+    return _LanguageSelectorView(
+      translationService: _translationService,
+      onLanguageChanged: () => setState(() {}),
     );
   }
 
@@ -324,6 +290,130 @@ class _FarmerSettingsScreenState extends State<FarmerSettingsScreen> {
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF2D6C50))),
+    );
+  }
+}
+
+class _LanguageSelectorView extends StatefulWidget {
+  final TranslationService translationService;
+  final VoidCallback onLanguageChanged;
+
+  const _LanguageSelectorView({
+    required this.translationService,
+    required this.onLanguageChanged,
+  });
+
+  @override
+  State<_LanguageSelectorView> createState() => _LanguageSelectorViewState();
+}
+
+class _LanguageSelectorViewState extends State<_LanguageSelectorView> {
+  final TextEditingController _searchController = TextEditingController();
+  List<String> _filteredLocales = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredLocales = widget.translationService.supportedLocales;
+  }
+
+  void _filterLanguages(String query) {
+    setState(() {
+      _filteredLocales = widget.translationService.supportedLocales.where((locale) {
+        final name = widget.translationService.getLanguageName(locale).toLowerCase();
+        return name.contains(query.toLowerCase());
+      }).toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF0F172A), // Dark theme as requested
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _filterLanguages,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Search language...',
+                hintStyle: const TextStyle(color: Colors.grey),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.05),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              itemCount: _filteredLocales.length,
+              separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 1),
+              itemBuilder: (context, index) {
+                final locale = _filteredLocales[index];
+                final isSelected = widget.translationService.currentLocale == locale;
+                
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  leading: Text(
+                    widget.translationService.getLanguageFlag(locale),
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  title: Text(
+                    widget.translationService.getLanguageName(locale),
+                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  trailing: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? Colors.transparent : Colors.grey.shade700,
+                        width: 2,
+                      ),
+                      color: isSelected ? const Color(0xFF2D6C50) : Colors.transparent,
+                    ),
+                    child: isSelected 
+                      ? const Icon(Icons.check, color: Colors.white, size: 16) 
+                      : null,
+                  ),
+                  onTap: () async {
+                    await widget.translationService.setLocale(locale);
+                    widget.onLanguageChanged();
+                    setState(() {});
+                  },
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2D6C50),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: const Text('Sauvegarder', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

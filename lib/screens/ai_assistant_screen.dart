@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../widgets/main_layout.dart';
 import '../services/ai_service.dart';
 
@@ -14,6 +15,10 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   final ScrollController _scrollController = ScrollController();
   final AIService _aiService = AIService();
   
+  stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+  bool _speechEnabled = false;
+  
   final List<Map<String, String>> _messages = [
     {
       'role': 'assistant',
@@ -22,6 +27,37 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   ];
 
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSpeech();
+  }
+
+  void _initSpeech() async {
+    _speechEnabled = await _speech.initialize();
+    setState(() {});
+  }
+
+  void _listen() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => print('onError: $val'),
+      );
+      if (available) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (val) => setState(() {
+            _inputController.text = val.recognizedWords;
+          }),
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
+  }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -227,20 +263,21 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                                   style: const TextStyle(fontSize: 14),
                                 ),
                               ),
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                icon: Icon(
-                                  Icons.mic,
-                                  color: const Color(0xFF2D6A4F).withValues(alpha: 0.6),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  icon: Icon(
+                                    _isListening ? Icons.mic : Icons.mic_none,
+                                    color: _isListening 
+                                        ? Colors.red 
+                                        : const Color(0xFF2D6A4F).withValues(alpha: 0.6),
+                                  ),
+                                  onPressed: _speechEnabled ? _listen : () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('La reconnaissance vocale n\'est pas disponible.'))
+                                    );
+                                  },
                                 ),
-                                onPressed: () {
-                                  // Voice input feature (to be implemented)
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Voice input coming soon!'))
-                                  );
-                                },
-                              ),
                             ],
                           ),
                         ),
