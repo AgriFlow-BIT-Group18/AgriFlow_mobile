@@ -14,9 +14,9 @@ class _DistributorMapScreenState extends State<DistributorMapScreen> {
   bool _isLoading = true;
   List<dynamic> _distributors = [];
   
-  // Simulated current location (Dakar)
-  final double currentLat = 14.7167;
-  final double currentLng = -17.4677;
+  // Simulated current location (Ouagadougou, Burkina Faso)
+  final double currentLat = 12.3714;
+  final double currentLng = -1.5197;
 
   @override
   void initState() {

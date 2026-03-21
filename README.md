@@ -1,5 +1,11 @@
 # AgriFlow Mobile App 📱
 
+**Project Authors:**
+- KIENDREBEOGO Moussa
+- KYEMTORE Gloria COMPAORE Adile
+- OUEDRAOGO Akram
+- YAMEOGO Angeline
+
 A high-performance Flutter mobile application tailored for farmers in Burkina Faso, providing an intuitive interface for agricultural resource procurement, digital assistance, and delivery monitoring.
 
 ## 🚀 Key Features

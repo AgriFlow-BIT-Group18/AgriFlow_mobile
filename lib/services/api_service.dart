@@ -259,6 +259,61 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.containsKey('token');
   }
+
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/auth/forgotpassword'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return data;
+      } else {
+        throw Exception(data['message'] ?? 'User not found');
+      }
+    } catch (e) {
+      if (e.toString().contains('Connection refused') ||
+          e.toString().contains('SocketException') ||
+          e.toString().contains('TimeoutException')) {
+        throw Exception(
+            'Cannot reach server. Please ensure the backend is running.');
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword(String token, String newPassword) async {
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$_baseUrl/auth/resetpassword/$token'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'password': newPassword}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return data;
+      } else {
+        throw Exception(data['message'] ?? 'Reset failed');
+      }
+    } catch (e) {
+      if (e.toString().contains('Connection refused') ||
+          e.toString().contains('SocketException') ||
+          e.toString().contains('TimeoutException')) {
+        throw Exception(
+            'Cannot reach server. Please ensure the backend is running.');
+      }
+      rethrow;
+    }
+  }
+
   Future<List<dynamic>> getNotifications() async {
     final token = await _getToken();
     final response = await http.get(
