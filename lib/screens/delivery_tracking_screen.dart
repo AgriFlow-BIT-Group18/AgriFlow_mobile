@@ -405,20 +405,19 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.network(
-                      'https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=1000&auto=format&fit=crop', // High quality delivery truck
-                      fit: BoxFit.cover,
-                    ),
                     Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withValues(alpha: 0.1),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.4),
-                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF2D6C50), Color(0xFF1B4332)], // Dark green themes
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.local_shipping,
+                          size: 100,
+                          color: Colors.white24,
                         ),
                       ),
                     ),
