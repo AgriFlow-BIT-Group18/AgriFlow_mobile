@@ -184,7 +184,7 @@ class _FarmerSettingsScreenState extends State<FarmerSettingsScreen> {
             Text(_translationService.translate('country').toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _countries.contains(_regionController.text) ? _regionController.text : 'Burkina Faso',
+              initialValue: _countries.contains(_regionController.text) ? _regionController.text : 'Burkina Faso',
               decoration: _inputDecoration('', Icons.public_outlined),
               items: _countries.map((String country) {
                 return DropdownMenuItem(value: country, child: Text(country));
@@ -343,7 +343,7 @@ class _LanguageSelectorViewState extends State<_LanguageSelectorView> {
                 hintStyle: const TextStyle(color: Colors.grey),
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
+                fillColor: Colors.white.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -356,7 +356,7 @@ class _LanguageSelectorViewState extends State<_LanguageSelectorView> {
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               itemCount: _filteredLocales.length,
-              separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 1),
+              separatorBuilder: (context, index) => Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
               itemBuilder: (context, index) {
                 final locale = _filteredLocales[index];
                 final isSelected = widget.translationService.currentLocale == locale;

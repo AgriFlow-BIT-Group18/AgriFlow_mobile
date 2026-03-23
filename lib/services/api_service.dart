@@ -63,7 +63,7 @@ class ApiService {
               'email': email,
               'password': password,
               'role': role,
-              if (region != null) 'region': region,
+              'region':? region,
             }),
           )
           .timeout(const Duration(seconds: 10));
@@ -194,7 +194,7 @@ class ApiService {
       headers: _headers(token),
       body: jsonEncode({
         'status': status,
-        if (currentLocation != null) 'currentLocation': currentLocation,
+        'currentLocation':? currentLocation,
       }),
     );
     final responseData = jsonDecode(response.body);

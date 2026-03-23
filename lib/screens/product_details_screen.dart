@@ -76,7 +76,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   if (reviews.isEmpty)
                     const Text('No reviews yet. Be the first to review!', style: TextStyle(color: Colors.grey))
                   else
-                    ...reviews.map((r) => _buildReviewItem(r)).toList(),
+                    ...reviews.map((r) => _buildReviewItem(r)),
                   const SizedBox(height: 32),
                   _buildAddReviewSection(),
                   const SizedBox(height: 40),
@@ -206,9 +206,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF2D6C50).withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFF2D6C50).withValues(alpha: 0.1)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(

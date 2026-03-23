@@ -3,6 +3,8 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../widgets/main_layout.dart';
 import '../services/ai_service.dart';
 
+import '../services/translation_service.dart';
+
 class AIAssistantScreen extends StatefulWidget {
   const AIAssistantScreen({super.key});
 
@@ -14,23 +16,25 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final AIService _aiService = AIService();
+  final TranslationService _ts = TranslationService();
   
-  stt.SpeechToText _speech = stt.SpeechToText();
+  final stt.SpeechToText _speech = stt.SpeechToText();
   bool _isListening = false;
   bool _speechEnabled = false;
   
-  final List<Map<String, String>> _messages = [
-    {
-      'role': 'assistant',
-      'content': 'Hello! I am your AgriFlow AI. I can help you with crop diagnosis, planting advice based on weather, or checking latest market price trends.'
-    },
-  ];
+  late final List<Map<String, String>> _messages;
 
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _messages = [
+      {
+        'role': 'assistant',
+        'content': _ts.translate('ai_welcome_msg')
+      },
+    ];
     _initSpeech();
   }
 
@@ -42,8 +46,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   void _listen() async {
     if (!_isListening) {
       bool available = await _speech.initialize(
-        onStatus: (val) => print('onStatus: $val'),
-        onError: (val) => print('onError: $val'),
+        onStatus: (val) => debugPrint('onStatus: $val'),
+        onError: (val) => debugPrint('onError: $val'),
       );
       if (available) {
         setState(() => _isListening = true);
@@ -73,7 +77,6 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
   Future<void> _handleSend() async {
     final text = _inputController.text.trim();
-    print('DEBUG: Sending message: $text');
     if (text.isEmpty || _isLoading) return;
 
     setState(() {
@@ -84,22 +87,18 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     _scrollToBottom();
 
     try {
-      print('DEBUG: Requesting completion from AIService...');
-      // Create a history list for the API (only user/assistant roles)
       final history = _messages.map((m) => {
         'role': m['role']!,
         'content': m['content']!,
       }).toList();
 
       final response = await _aiService.getChatCompletion(history);
-      print('DEBUG: Received response: ${response.substring(0, 20)}...');
 
       setState(() {
         _messages.add({'role': 'assistant', 'content': response});
         _isLoading = false;
       });
     } catch (e) {
-      print('DEBUG: Error in AIAssistantScreen: $e');
       setState(() {
         _messages.add({
           'role': 'assistant',
@@ -131,9 +130,9 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'AgriFlow AI Assistant',
-                  style: TextStyle(
+                Text(
+                  _ts.translate('ai_assistant_title'),
+                  style: const TextStyle(
                     color: Color(0xFF0F172A), // slate-900
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -150,9 +149,9 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      'Online • AI Expert',
-                      style: TextStyle(
+                    Text(
+                      _ts.translate('online_expert'),
+                      style: const TextStyle(
                         color: Color(0xFF64748B), // slate-500
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -227,11 +226,11 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: Row(
                         children: [
-                          _buildSuggestionChip('Diagnose a plant'),
+                          _buildSuggestionChip(_ts.translate('ai_suggestion_1')),
                           const SizedBox(width: 8),
-                          _buildSuggestionChip('Best time to plant maize?'),
+                          _buildSuggestionChip(_ts.translate('ai_suggestion_2')),
                           const SizedBox(width: 8),
-                          _buildSuggestionChip('XOF Fertilizer Prices'),
+                          _buildSuggestionChip(_ts.translate('ai_suggestion_3')),
                         ],
                       ),
                     ),
@@ -252,11 +251,11 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                                 child: TextField(
                                   controller: _inputController,
                                   onSubmitted: (_) => _handleSend(),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Ask AgriFlow AI...',
+                                  decoration: InputDecoration(
+                                    hintText: _ts.translate('ai_input_hint'),
                                     border: InputBorder.none,
                                     isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(
+                                    contentPadding: const EdgeInsets.symmetric(
                                       vertical: 12,
                                     ),
                                   ),
@@ -333,10 +332,10 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem(context, 'Home', Icons.home_outlined, 0),
-                  _buildNavItem(context, 'Products', Icons.grid_view_outlined, 1),
-                  _buildNavItem(context, 'Orders', Icons.receipt_long_outlined, 2),
-                  _buildNavItem(context, 'Profile', Icons.person_outline, 4),
+                  _buildNavItem(context, _ts.translate('home'), Icons.home_outlined, 0),
+                  _buildNavItem(context, _ts.translate('catalogue'), Icons.grid_view_outlined, 1),
+                  _buildNavItem(context, _ts.translate('orders'), Icons.receipt_long_outlined, 2),
+                  _buildNavItem(context, _ts.translate('profile'), Icons.person_outline, 4),
                 ],
               ),
             ),
@@ -377,9 +376,9 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
               color: const Color(0xFF2D6A4F).withValues(alpha: 0.05),
             ),
           ),
-          child: const Text(
-            'Thinking...',
-            style: TextStyle(
+          child: Text(
+            _ts.translate('thinking'),
+            style: const TextStyle(
               fontSize: 14,
               color: Color(0xFF64748B),
               fontStyle: FontStyle.italic,

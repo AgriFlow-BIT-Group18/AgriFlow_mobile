@@ -5,6 +5,8 @@ import '../screens/order_history_screen.dart';
 import '../screens/delivery_tracking_screen.dart';
 import '../screens/farmer_profile_screen.dart';
 
+import '../services/translation_service.dart';
+
 class MainLayout extends StatefulWidget {
   final int initialIndex;
   const MainLayout({super.key, this.initialIndex = 0});
@@ -15,6 +17,7 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   late int _currentIndex;
+  final TranslationService _ts = TranslationService();
 
   final List<Widget> _screens = [
     const FarmerHomeScreen(),     // Home
@@ -47,12 +50,12 @@ class _MainLayoutState extends State<MainLayout> {
             _currentIndex = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Catalogue'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Orders'),
-          BottomNavigationBarItem(icon: Icon(Icons.local_shipping), label: 'Delivery'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        items: [
+          BottomNavigationBarItem(icon: const Icon(Icons.home), label: _ts.translate('home')),
+          BottomNavigationBarItem(icon: const Icon(Icons.grid_view), label: _ts.translate('catalogue')),
+          BottomNavigationBarItem(icon: const Icon(Icons.receipt_long), label: _ts.translate('orders')),
+          BottomNavigationBarItem(icon: const Icon(Icons.local_shipping), label: _ts.translate('delivery')),
+          BottomNavigationBarItem(icon: const Icon(Icons.person), label: _ts.translate('profile')),
         ],
       ),
     );

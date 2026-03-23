@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
-import 'product_catalogue_screen.dart';
 import 'distributor_map_screen.dart';
 import 'ai_assistant_screen.dart';
 import 'product_details_screen.dart';
 import '../widgets/main_layout.dart';
 import '../services/weather_service.dart';
+
+import '../services/translation_service.dart';
 
 class FarmerHomeScreen extends StatefulWidget {
   const FarmerHomeScreen({super.key});
@@ -19,8 +20,8 @@ class FarmerHomeScreen extends StatefulWidget {
 class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
   final ApiService _apiService = ApiService();
   final WeatherService _weatherService = WeatherService();
+  final TranslationService _ts = TranslationService();
   String _userName = 'Farmer';
-  bool _isLoading = true;
   int _pendingCount = 0;
   int _deliveredCount = 0;
   WeatherData? _weather;
@@ -33,7 +34,6 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
     try {
       final prefs = await SharedPreferences.getInstance();
       final userStr = prefs.getString('user');
@@ -64,7 +64,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
     } catch (e) {
       debugPrint('Error loading home data: $e');
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() {});
     }
   }
 
@@ -82,9 +82,9 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
               const SizedBox(height: 24),
               _buildStatsCard(),
               const SizedBox(height: 24),
-              const Text(
-                'Quick Actions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+              Text(
+                _ts.translate('quick_actions'),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
               ),
               const SizedBox(height: 16),
               _buildQuickActions(),
@@ -92,9 +92,9 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
               _buildWeatherTip(),
               if (_recommendations.isNotEmpty) ...[
                 const SizedBox(height: 24),
-                const Text(
-                  'Recommended for You',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                Text(
+                  _ts.translate('recommended'),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                 ),
                 const SizedBox(height: 16),
                 _buildRecommendations(),
@@ -114,7 +114,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Welcome back,',
+              _ts.translate('welcome_back'),
               style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
             ),
             Text(
@@ -145,24 +145,24 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF2D6C50).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: const Color(0xFF2D6C50).withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.analytics_outlined, color: Colors.white, size: 20),
-              SizedBox(width: 8),
-              Text('Your Activity Summary', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              const Icon(Icons.analytics_outlined, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(_ts.translate('account_info'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('Orders', _pendingCount.toString(), 'Pending'),
-              Container(width: 1, height: 40, color: Colors.white.withOpacity(0.3)),
+              _buildStatItem(_ts.translate('orders'), _pendingCount.toString(), 'Pending'),
+              Container(width: 1, height: 40, color: Colors.white.withValues(alpha: 0.3)),
               _buildStatItem('Success', _deliveredCount.toString(), 'Delivered'),
             ],
           ),
@@ -176,7 +176,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
       children: [
         Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        Text(sub, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
+        Text(sub, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
       ],
     );
   }
@@ -191,35 +191,35 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
       childAspectRatio: 1.3,
       children: [
         _buildActionCard(
-          'Order Inputs',
+          _ts.translate('order_inputs'),
           Icons.shopping_basket_outlined,
           const Color(0xFFE8F5E9),
           const Color(0xFF2D6C50),
           () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MainLayout(initialIndex: 1))),
         ),
         _buildActionCard(
-          'My Orders',
+          _ts.translate('my_orders'),
           Icons.assignment_outlined,
           const Color(0xFFE3F2FD),
           const Color(0xFF1976D2),
           () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MainLayout(initialIndex: 2))),
         ),
         _buildActionCard(
-          'Find Supplier',
+          _ts.translate('find_supplier'),
           Icons.map_outlined,
           const Color(0xFFE1F5FE),
           const Color(0xFF0288D1),
           () => Navigator.push(context, MaterialPageRoute(builder: (_) => DistributorMapScreen())),
         ),
         _buildActionCard(
-          'Track Delivery',
+          _ts.translate('track_delivery'),
           Icons.local_shipping_outlined,
           const Color(0xFFFFF3E0),
           const Color(0xFFF57C00),
           () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MainLayout(initialIndex: 3))),
         ),
         _buildActionCard(
-          'AI Help',
+          _ts.translate('ai_help'),
           Icons.auto_awesome_outlined,
           const Color(0xFFF3E5F5),
           const Color(0xFF7B1FA2),
@@ -242,7 +242,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.1)),
+          border: Border.all(color: color.withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

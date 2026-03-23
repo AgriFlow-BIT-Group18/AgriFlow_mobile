@@ -108,7 +108,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             Expanded(
               child: ListView.separated(
                 itemCount: (order['orderItems'] as List).length,
-                separatorBuilder: (_, __) => const Divider(height: 24),
+                separatorBuilder: (_, index) => const Divider(height: 24),
                 itemBuilder: (context, i) {
                   final item = order['orderItems'][i];
                   return Row(
@@ -228,7 +228,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         child: ListView.separated(
                           padding: const EdgeInsets.all(16),
                           itemCount: _filteredOrders.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
+                          separatorBuilder: (_, index) => const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final order = _filteredOrders[index];
                             final status = order['status'] ?? 'pending';
@@ -247,7 +247,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
+                                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)],
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

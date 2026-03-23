@@ -3,6 +3,7 @@ import '../widgets/main_layout.dart';
 import '../services/api_service.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
+import '../services/translation_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,11 +18,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final ApiService _apiService = ApiService();
+  final TranslationService _ts = TranslationService();
 
   Future<void> _handleLogin() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your credentials')),
+        SnackBar(content: Text(_ts.translate('enter_credentials'))),
       );
       return;
     }
@@ -78,14 +80,18 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.25,
-              child: const Center(
+              height: MediaQuery.of(context).size.height * 0.3,
+              child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.eco_outlined, color: Colors.white, size: 48),
-                    SizedBox(height: 8),
-                    Text(
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: Image.asset('assets/images/logo.png', width: 60, height: 60),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
                       'AgriFlow',
                       style: TextStyle(
                         fontSize: 32,
@@ -105,29 +111,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24.0),
-                    topRight: Radius.circular(24.0),
+                    topLeft: Radius.circular(32.0),
+                    topRight: Radius.circular(32.0),
                   ),
                 ),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        'Sign In',
+                      Text(
+                        _ts.translate('sign_in'),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Enter your credentials to continue',
+                      const SizedBox(height: 8),
+                      Text(
+                        _ts.translate('enter_credentials'),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Color(0xFF64748B)),
+                        style: const TextStyle(fontSize: 16, color: Color(0xFF64748B)),
                       ),
                       const SizedBox(height: 32),
-                      const Text(
-                        'Email address',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF334155)),
+                      Text(
+                        _ts.translate('email'),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
                       ),
                       const SizedBox(height: 6),
                       TextField(
@@ -144,16 +150,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Password',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF334155)),
+                      Text(
+                        _ts.translate('password'),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
                       ),
                       const SizedBox(height: 6),
                       TextField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
-                          hintText: 'Your password',
+                          hintText: _ts.translate('password'),
                           prefixIcon: const Icon(Icons.lock_outline),
                           suffixIcon: IconButton(
                             icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
@@ -177,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: _isLoading
                             ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : const Text('Sign In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            : Text(_ts.translate('sign_in'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(height: 24),
                       Center(
@@ -186,9 +192,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
                           ),
-                          child: const Text(
-                            'Forgot password?',
-                            style: TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold),
+                          child: Text(
+                            _ts.translate('forgot_password'),
+                            style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -196,15 +202,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have an account? "),
+                          Text(_ts.translate('dont_have_account')),
                           GestureDetector(
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => const RegisterScreen()),
                             ),
-                            child: const Text(
-                              'Sign Up',
-                              style: TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold),
+                            child: Text(
+                              _ts.translate('sign_up'),
+                              style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],

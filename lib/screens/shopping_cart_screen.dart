@@ -116,7 +116,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✅ ${_paymentMethod} Payment Verified. Order submitted!'),
+            content: Text('✅ $_paymentMethod Payment Verified. Order submitted!'),
             backgroundColor: const Color(0xFF2D6C50),
             duration: const Duration(seconds: 3),
           ),
@@ -230,7 +230,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, -5))],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, -5))],
               ),
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
               child: Column(
@@ -307,7 +307,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)],
       ),
       padding: const EdgeInsets.all(16),
       child: Row(

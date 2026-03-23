@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/main_layout.dart';
 import '../services/api_service.dart';
-import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -179,7 +178,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text('Country', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        value: _selectedCountry,
+                        initialValue: _selectedCountry,
                         decoration: _inputDecoration('', Icons.public_outlined),
                         items: _countries.map((String country) {
                           return DropdownMenuItem(value: country, child: Text(country));
@@ -191,7 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text('I am a...', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        value: _selectedRole,
+                        initialValue: _selectedRole,
                         decoration: _inputDecoration('', Icons.badge_outlined),
                         items: const [
                           DropdownMenuItem(value: 'farmer', child: Text('Farmer')),

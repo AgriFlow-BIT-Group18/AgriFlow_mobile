@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 
 class AIService {
   static const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
@@ -29,7 +30,7 @@ AgriFlow Neural: Primary AI brain. Professional, concise, premium.
         ...messages,
       ];
 
-      print('AI Request: Sending ${messages.length} messages to Groq...');
+      debugPrint('AI Request: Sending ${messages.length} messages to Groq...');
       
       final response = await http.post(
         Uri.parse(_groqApiUrl),
@@ -45,20 +46,20 @@ AgriFlow Neural: Primary AI brain. Professional, concise, premium.
         }),
       ).timeout(const Duration(seconds: 30));
 
-      print('AI Response Status: ${response.statusCode}');
+      debugPrint('AI Response Status: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final content = data['choices'][0]['message']['content'];
-        print('AI Response Success: ${content.substring(0, content.length > 50 ? 50 : content.length)}...');
+        debugPrint('AI Response Success: ${content.substring(0, content.length > 50 ? 50 : content.length)}...');
         return content;
       } else {
-        print('AI Response Error: ${response.body}');
+        debugPrint('AI Response Error: ${response.body}');
         final errorData = jsonDecode(response.body);
         throw Exception(errorData['error']?['message'] ?? 'Failed to connect to Groq AI (Status: ${response.statusCode})');
       }
     } catch (e) {
-      print('AI Catch Error: $e');
+      debugPrint('AI Catch Error: $e');
       throw Exception('AI Error: ${e.toString()}');
     }
   }

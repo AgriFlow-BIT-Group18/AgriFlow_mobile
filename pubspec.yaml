@@ -1,11 +1,5 @@
 name: agriflow_mobile
 description: "A comprehensive digital ecosystem for agricultural distribution in Burkina Faso."
-authors:
-  - KIENDREBEOGO Moussa
-  - KYEMTORE Gloria
-  - COMPAORE Adile
-  - OUEDRAOGO Akram
-  - YAMEOGO Angeline
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

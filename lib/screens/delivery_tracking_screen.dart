@@ -164,7 +164,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                            ),
                          )
                        : DropdownButtonFormField<String>(
-                           value: selectedOrderId,
+                           initialValue: selectedOrderId,
                            decoration: InputDecoration(
                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -240,22 +240,24 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                             'driverPhone': driverPhoneController.text.trim(),
                           });
                           
-                          if (mounted) {
+                           if (mounted && context.mounted) {
+                             Navigator.pop(context); // Close loading
+                             Navigator.pop(context); // Close sheet
+                             _fetchData();
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               const SnackBar(content: Text('Livraison créée avec succès !'), backgroundColor: Colors.green)
+                             );
+                           }
+                        } catch (e) {
+                          if (mounted && context.mounted) {
                             Navigator.pop(context); // Close loading
-                            Navigator.pop(context); // Close sheet
-                            _fetchData();
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Livraison créée avec succès !'), backgroundColor: Colors.green)
+                              SnackBar(
+                                content: Text('Erreur lors de la création : ${e.toString().replaceAll('Exception: ', '')}'),
+                                backgroundColor: Colors.red,
+                              )
                             );
                           }
-                        } catch (e) {
-                          if (mounted) Navigator.pop(context); // Close loading
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Erreur lors de la création : ${e.toString().replaceAll('Exception: ', '')}'),
-                              backgroundColor: Colors.red,
-                            )
-                          );
                         }
                       },
                       child: const Text('Créer la Livraison', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -305,7 +307,6 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
     final address = order['shippingAddress']?['address'] ?? 'Farm Plot 42, Ashanti Region';
     final city = order['shippingAddress']?['city'] ?? 'Kumasi';
     final driverName = delivery['driverName'] ?? 'Jean-Baptiste K.';
-    final driverPhone = delivery['driverPhone'] ?? '';
     final estimatedArrival = delivery['estimatedDeliveryTime'] != null 
         ? DateTime.parse(delivery['estimatedDeliveryTime']).toLocal().toString().substring(11, 16)
         : '3:30 PM';
@@ -335,8 +336,8 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF2D6C50).withOpacity(0.1)),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                border: Border.all(color: const Color(0xFF2D6C50).withValues(alpha: 0.1)),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
               ),
               child: Column(
                 children: [
@@ -353,7 +354,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(status).withOpacity(0.1),
+                          color: _getStatusColor(status).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -393,7 +394,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -414,9 +415,9 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.black.withOpacity(0.1),
+                            Colors.black.withValues(alpha: 0.1),
                             Colors.transparent,
-                            Colors.black.withOpacity(0.4),
+                            Colors.black.withValues(alpha: 0.4),
                           ],
                         ),
                       ),
@@ -427,7 +428,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
@@ -459,14 +460,14 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF2D6C50).withOpacity(0.1)),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 5)],
+                border: Border.all(color: const Color(0xFF2D6C50).withValues(alpha: 0.1)),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 5)],
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: const Color(0xFF2D6C50).withOpacity(0.1),
+                    backgroundColor: const Color(0xFF2D6C50).withValues(alpha: 0.1),
                     child: Text(driverName.substring(0, 1), style: const TextStyle(color: Color(0xFF2D6C50), fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(width: 12),
@@ -482,7 +483,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                   IconButton(
                     icon: const Icon(Icons.call, color: Color(0xFF2D6C50)),
                     onPressed: () {},
-                    style: IconButton.styleFrom(backgroundColor: const Color(0xFF2D6C50).withOpacity(0.05)),
+                    style: IconButton.styleFrom(backgroundColor: const Color(0xFF2D6C50).withValues(alpha: 0.05)),
                   ),
                 ],
               ),
@@ -495,14 +496,14 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF2D6C50).withOpacity(0.1)),
+                border: Border.all(color: const Color(0xFF2D6C50).withValues(alpha: 0.1)),
               ),
               child: Row(
                 children: [
                   Column(
                     children: [
                       const Icon(Icons.location_on, color: Color(0xFF2D6C50), size: 18),
-                      Container(width: 1, height: 30, color: const Color(0xFF2D6C50).withOpacity(0.2)),
+                      Container(width: 1, height: 30, color: const Color(0xFF2D6C50).withValues(alpha: 0.2)),
                       const Icon(Icons.home, color: Colors.orange, size: 18),
                     ],
                   ),
@@ -530,7 +531,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF2D6C50).withOpacity(0.1)),
+                border: Border.all(color: const Color(0xFF2D6C50).withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -543,7 +544,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(color: const Color(0xFF2D6C50).withOpacity(0.05), borderRadius: BorderRadius.circular(8)),
+                          decoration: BoxDecoration(color: const Color(0xFF2D6C50).withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
                           child: const Icon(Icons.inventory_2, color: Color(0xFF2D6C50), size: 18),
                         ),
                         const SizedBox(width: 12),
@@ -579,7 +580,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                     
                     await _apiService.updateDeliveryStatus(delivery['_id'].toString(), 'delivered');
                     
-                    if (mounted) {
+                    if (mounted && context.mounted) {
                       Navigator.pop(context); // Close loading
                       _fetchData(); // Refresh UI
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -587,10 +588,12 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                       );
                     }
                   } catch (e) {
-                    if (mounted) Navigator.pop(context); // Close loading
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red)
-                    );
+                    if (mounted && context.mounted) {
+                      Navigator.pop(context); // Close loading
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red)
+                      );
+                    }
                   }
                 },
                 icon: const Icon(Icons.verified),
@@ -601,7 +604,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
                   minimumSize: const Size(double.infinity, 54),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 5,
-                  shadowColor: const Color(0xFF2D6C50).withOpacity(0.3),
+                  shadowColor: const Color(0xFF2D6C50).withValues(alpha: 0.3),
                 ),
               ),
           ],
@@ -615,7 +618,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
       width: 28, height: 28,
       margin: const EdgeInsets.only(left: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D6C50).withOpacity(0.1),
+        color: const Color(0xFF2D6C50).withValues(alpha: 0.1),
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
       ),

@@ -8,6 +8,8 @@ import 'product_details_screen.dart';
 import 'notification_screen.dart';
 import '../services/api_service.dart';
 
+import '../services/translation_service.dart';
+
 class ProductCatalogueScreen extends StatefulWidget {
   const ProductCatalogueScreen({super.key});
 
@@ -17,6 +19,7 @@ class ProductCatalogueScreen extends StatefulWidget {
 
 class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
   final ApiService _apiService = ApiService();
+  final TranslationService _ts = TranslationService();
   final AudioPlayer _audioPlayer = AudioPlayer();
   List<dynamic> _products = [];
   bool _isLoading = true;
@@ -135,7 +138,7 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Good morning, $_userName 👋',
+                            '${_ts.translate('welcome_back')} $_userName 👋',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -202,11 +205,11 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const TextField(
+                    child: TextField(
                       decoration: InputDecoration(
-                        hintText: 'Search seeds, fertilizers...',
+                        hintText: _ts.translate('search_hint'),
                         border: InputBorder.none,
-                        icon: Icon(Icons.search, color: Colors.grey),
+                        icon: const Icon(Icons.search, color: Colors.grey),
                       ),
                     ),
                   ),
@@ -290,7 +293,7 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFF2D6C50) : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF2D6C50).withOpacity(0.1)),
+          border: Border.all(color: const Color(0xFF2D6C50).withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
@@ -322,7 +325,7 @@ class _ProductCatalogueScreenState extends State<ProductCatalogueScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
