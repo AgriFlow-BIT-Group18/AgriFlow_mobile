@@ -21,26 +21,37 @@ class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF2D6A4F),
-              Color(0xFF52B788),
-            ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Image d'arrière-plan (identique au web)
+          Image.asset(
+            'assets/images/hero_bg.png',
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
           ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Language Switcher
+          // Dégradé superposé sombre (comme bg-sidebar/60 via-sidebar/20 to-sidebar)
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF1B4332).withValues(alpha: 0.6),
+                  const Color(0xFF1B4332).withValues(alpha: 0.2),
+                  const Color(0xFF1B4332),
+                ],
+              ),
+            ),
+          ),
+          // Contenu principal
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Language Switcher
                 Align(
                   alignment: Alignment.topRight,
                   child: SingleChildScrollView(
@@ -164,8 +175,9 @@ class _LandingScreenState extends State<LandingScreen> {
                 const SizedBox(height: 48),
               ],
             ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
