@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_tts/flutter_tts.dart';
 import '../widgets/main_layout.dart';
 import '../services/ai_service.dart';
 
@@ -19,6 +20,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   final TranslationService _ts = TranslationService();
   
   final stt.SpeechToText _speech = stt.SpeechToText();
+  final FlutterTts _tts = FlutterTts();
   bool _isListening = false;
   bool _speechEnabled = false;
   
@@ -44,6 +46,9 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   }
 
   void _listen() async {
+    // Stop toute lecture en cours avant d'écouter
+    await _tts.stop();
+
     if (!_isListening) {
       bool available = await _speech.initialize(
         onStatus: (val) => debugPrint('onStatus: $val'),
@@ -51,10 +56,20 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
       );
       if (available) {
         setState(() => _isListening = true);
+        
+        // Find the best locale matching the current app language
+        var locales = await _speech.locales();
+        String currentLang = _ts.currentLocale;
+        var targetLocale = locales.firstWhere(
+            (l) => l.localeId.toLowerCase().startsWith(currentLang.toLowerCase()), 
+            orElse: () => locales.isNotEmpty ? locales.first : stt.LocaleName('en_US', 'English')
+        );
+
         _speech.listen(
           onResult: (val) => setState(() {
             _inputController.text = val.recognizedWords;
           }),
+          localeId: targetLocale.localeId,
         );
       }
     } else {
@@ -98,6 +113,10 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
         _messages.add({'role': 'assistant', 'content': response});
         _isLoading = false;
       });
+      
+      // Play TTS audio
+      await _tts.setLanguage(_ts.currentLocale);
+      await _tts.speak(response);
     } catch (e) {
       setState(() {
         _messages.add({
@@ -108,6 +127,14 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
       });
     }
     _scrollToBottom();
+  }
+
+  @override
+  void dispose() {
+    _tts.stop();
+    _inputController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
