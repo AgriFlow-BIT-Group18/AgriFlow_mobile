@@ -94,6 +94,12 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     final text = _inputController.text.trim();
     if (text.isEmpty || _isLoading) return;
 
+    // Stop listening so it doesn't overwrite the cleared text
+    if (_isListening) {
+      _speech.stop();
+      setState(() => _isListening = false);
+    }
+
     setState(() {
       _messages.add({'role': 'user', 'content': text});
       _inputController.clear();
@@ -190,6 +196,22 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Color(0xFF2D6A4F)),
+            onPressed: () {
+              setState(() {
+                _messages.clear();
+                _messages.add({
+                  'role': 'assistant',
+                  'content': _ts.translate('ai_welcome_msg')
+                });
+                _tts.stop();
+              });
+            },
+            tooltip: 'Clear Conversation',
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
           child: Container(
