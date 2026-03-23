@@ -51,8 +51,16 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
     if (!_isListening) {
       bool available = await _speech.initialize(
-        onStatus: (val) => debugPrint('onStatus: $val'),
-        onError: (val) => debugPrint('onError: $val'),
+        onStatus: (val) {
+          debugPrint('onStatus: $val');
+          if (val == 'done' || val == 'notListening') {
+            if (mounted && _isListening) setState(() => _isListening = false);
+          }
+        },
+        onError: (val) {
+          debugPrint('onError: $val');
+          if (mounted && _isListening) setState(() => _isListening = false);
+        },
       );
       if (available) {
         setState(() => _isListening = true);
@@ -66,10 +74,14 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
         );
 
         _speech.listen(
-          onResult: (val) => setState(() {
-            _inputController.text = val.recognizedWords;
-          }),
+          onResult: (val) {
+            if (!mounted || !_isListening) return;
+            setState(() {
+              _inputController.text = val.recognizedWords;
+            });
+          },
           localeId: targetLocale.localeId,
+          cancelOnError: true,
         );
       }
     } else {
@@ -96,7 +108,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
     // Stop listening so it doesn't overwrite the cleared text
     if (_isListening) {
-      _speech.stop();
+      _speech.cancel(); // cancel() completely drops pending results
       setState(() => _isListening = false);
     }
 
