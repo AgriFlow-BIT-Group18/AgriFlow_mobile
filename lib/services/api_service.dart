@@ -1,15 +1,12 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:5000/api';
-  static const String emulatorUrl = 'http://10.0.2.2:5000/api';
+  static const String baseUrl = 'https://agriflow-backend-te8k.onrender.com/api';
 
   static String get _baseUrl {
-    if (kIsWeb) return baseUrl;
-    return emulatorUrl;
+    return baseUrl;
   }
 
   Future<String?> _getToken() async {
