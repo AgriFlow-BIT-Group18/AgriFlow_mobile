@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 class AIService {
   static const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
   static String get _apiKey => dotenv.env['GROQ_API_KEY'] ?? '';
-  static const String _model = 'llama-3.3-70b-versatile';
+  static const String _model = 'llama-3.1-8b-instant';
 
   static const String _systemPrompt = '''
 AgriFlow Neural: Primary AI brain. Professional, concise, premium. 
@@ -16,11 +16,12 @@ AgriFlow Neural: Primary AI brain. Professional, concise, premium.
 2. You MUST RESPOND EXCLUSIVELY in that exact same language (English for English, French for French, Spanish for Spanish, etc.).
 3. Ignore the language of any previous Assistant messages. Only the user's latest message determines your output language.
 4. NEVER mix languages in a single response.
+5. NEVER apologize for the language you are speaking in. Just answer the question directly.
 
 ### CONTEXT & RULES:
 - CURRENCY: Always use "FCFA".
 - PROJECT: AgriFlow is a digital system for agricultural input distribution in West Africa.
-- TONE: Professional, efficient, and direct.
+- TONE: Professional, efficient, and ultra-concise. Shorter answers are better for voice interaction.
 ''';
 
   Future<String> getChatCompletion(List<Map<String, String>> messages) async {

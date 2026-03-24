@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter/foundation.dart';
+import '../services/speech_service.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../widgets/main_layout.dart';
 import '../services/ai_service.dart';
@@ -13,20 +14,31 @@ class AIAssistantScreen extends StatefulWidget {
   State<AIAssistantScreen> createState() => _AIAssistantScreenState();
 }
 
-class _AIAssistantScreenState extends State<AIAssistantScreen> {
+class _AIAssistantScreenState extends State<AIAssistantScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final AIService _aiService = AIService();
   final TranslationService _ts = TranslationService();
   
-  final stt.SpeechToText _speech = stt.SpeechToText();
+  final SpeechService _speech = SpeechService();
   final FlutterTts _tts = FlutterTts();
   bool _isListening = false;
-  bool _speechEnabled = false;
-  
-  late final List<Map<String, String>> _messages;
-
   bool _isLoading = false;
+  bool _isTranscribing = false;
+  late final List<Map<String, String>> _messages;
+  String? _currentTtsLanguage;
+  
+  // Animation for pulse effect
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  // Mapping locale courte -> locale TTS complète
+  static const Map<String, String> _ttsLocaleMap = {
+    'en': 'en-US',
+    'fr': 'fr-FR',
+    'pt': 'pt-BR',
+    'es': 'es-ES',
+  };
 
   @override
   void initState() {
@@ -37,56 +49,68 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
         'content': _ts.translate('ai_welcome_msg')
       },
     ];
-    _initSpeech();
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.5).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    _initTts();
   }
 
-  void _initSpeech() async {
-    _speechEnabled = await _speech.initialize();
-    setState(() {});
+  void _initTts() async {
+    await _tts.setSpeechRate(0.45);
+    await _tts.setVolume(1.0);
+    await _tts.setPitch(1.0);
+    await _tts.awaitSpeakCompletion(true);
+    
+    if (kIsWeb) {
+      // Force fetching voices on Web to avoid [object SpeechSynthesisErrorEvent]
+      await _tts.getVoices;
+    }
+
+    final ttsLocale = _ttsLocaleMap[_ts.currentLocale] ?? 'en-US';
+    await _tts.setLanguage(ttsLocale);
   }
+
+
 
   void _listen() async {
-    // Stop toute lecture en cours avant d'écouter
     await _tts.stop();
 
     if (!_isListening) {
-      bool available = await _speech.initialize(
-        onStatus: (val) {
-          debugPrint('onStatus: $val');
-          if (val == 'done' || val == 'notListening') {
-            if (mounted && _isListening) setState(() => _isListening = false);
-          }
-        },
-        onError: (val) {
-          debugPrint('onError: $val');
-          if (mounted && _isListening) setState(() => _isListening = false);
-        },
-      );
-      if (available) {
-        setState(() => _isListening = true);
-        
-        // Find the best locale matching the current app language
-        var locales = await _speech.locales();
-        String currentLang = _ts.currentLocale;
-        var targetLocale = locales.firstWhere(
-            (l) => l.localeId.toLowerCase().startsWith(currentLang.toLowerCase()), 
-            orElse: () => locales.isNotEmpty ? locales.first : stt.LocaleName('en_US', 'English')
-        );
-
-        _speech.listen(
-          onResult: (val) {
-            if (!mounted || !_isListening) return;
-            setState(() {
-              _inputController.text = val.recognizedWords;
-            });
-          },
-          localeId: targetLocale.localeId,
-          cancelOnError: true,
-        );
-      }
+      setState(() => _isListening = true);
+      _pulseController.repeat(reverse: true);
+      await _speech.startRecording();
     } else {
-      setState(() => _isListening = false);
-      _speech.stop();
+      _pulseController.stop();
+      _pulseController.reset();
+      setState(() {
+        _isListening = false;
+        _isTranscribing = true;
+      });
+      
+      final text = await _speech.stopRecording();
+      
+      if (mounted) {
+        setState(() => _isTranscribing = false);
+        if (text != null && text.isNotEmpty) {
+          _inputController.text = text;
+          _handleSend();
+        } else if (text == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_ts.currentLocale == 'fr' 
+                  ? 'Erreur de transcription. Réessayez.' 
+                  : 'Transcription error. Please try again.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -108,13 +132,15 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
     // Stop listening so it doesn't overwrite the cleared text
     if (_isListening) {
-      _speech.cancel(); // cancel() completely drops pending results
+      await _speech.stopRecording();
       setState(() => _isListening = false);
     }
 
+    // Capturer le texte et vider immédiatement le champ
+    _inputController.clear();
+
     setState(() {
       _messages.add({'role': 'user', 'content': text});
-      _inputController.clear();
       _isLoading = true;
     });
     _scrollToBottom();
@@ -125,6 +151,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
         'content': m['content']!,
       }).toList();
 
+      final currentLocale = _ts.currentLocale;
       final response = await _aiService.getChatCompletion(history);
 
       setState(() {
@@ -133,13 +160,20 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
       });
       
       // Play TTS audio
-      await _tts.setLanguage(_ts.currentLocale);
+      final String ttsLang = _ttsLocaleMap[currentLocale] ?? 'en-US';
+      
+      if (_currentTtsLanguage != ttsLang) {
+        await _tts.setLanguage(ttsLang);
+        _currentTtsLanguage = ttsLang;
+      }
       await _tts.speak(response);
     } catch (e) {
       setState(() {
         _messages.add({
           'role': 'assistant',
-          'content': 'Sorry, I encountered an error: ${e.toString()}. Please check your connection and try again.'
+          'content': _ts.currentLocale == 'fr'
+              ? 'Désolé, une erreur est survenue : ${e.toString()}. Vérifiez votre connexion.'
+              : 'Sorry, I encountered an error: ${e.toString()}. Please check your connection.'
         });
         _isLoading = false;
       });
@@ -149,7 +183,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
   @override
   void dispose() {
-    _tts.stop();
+    _pulseController.dispose();
+    _speech.dispose();
     _inputController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -212,16 +247,25 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
           IconButton(
             icon: const Icon(Icons.delete_outline, color: Color(0xFF2D6A4F)),
             onPressed: () {
+              // Arrêter le STT en cours
+              if (_isListening) {
+                _speech.stopRecording();
+              }
+              // Arrêter le TTS en cours
+              _tts.stop();
+              // Vider le champ de texte
+              _inputController.clear();
               setState(() {
+                _isListening = false;
+                _isLoading = false;
                 _messages.clear();
                 _messages.add({
                   'role': 'assistant',
                   'content': _ts.translate('ai_welcome_msg')
                 });
-                _tts.stop();
               });
             },
-            tooltip: 'Clear Conversation',
+            tooltip: _ts.currentLocale == 'fr' ? 'Effacer la conversation' : 'Clear Conversation',
           ),
         ],
         bottom: PreferredSize(
@@ -313,7 +357,9 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                                   controller: _inputController,
                                   onSubmitted: (_) => _handleSend(),
                                   decoration: InputDecoration(
-                                    hintText: _ts.translate('ai_input_hint'),
+                                    hintText: _isTranscribing 
+                                        ? (_ts.currentLocale == 'fr' ? 'Transcription...' : 'Transcribing...')
+                                        : _ts.translate('ai_input_hint'),
                                     border: InputBorder.none,
                                     isDense: true,
                                     contentPadding: const EdgeInsets.symmetric(
@@ -321,22 +367,38 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                                     ),
                                   ),
                                   style: const TextStyle(fontSize: 14),
+                                  enabled: !_isLoading && !_isTranscribing,
                                 ),
                               ),
                                 IconButton(
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
-                                  icon: Icon(
-                                    _isListening ? Icons.mic : Icons.mic_none,
-                                    color: _isListening 
-                                        ? Colors.red 
-                                        : const Color(0xFF2D6A4F).withValues(alpha: 0.6),
-                                  ),
-                                  onPressed: _speechEnabled ? _listen : () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('La reconnaissance vocale n\'est pas disponible.'))
+                                onPressed: _listen,
+                                icon: AnimatedBuilder(
+                                  animation: _pulseAnimation,
+                                  builder: (context, child) {
+                                    return Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        if (_isListening)
+                                          Container(
+                                            width: 24 * _pulseAnimation.value,
+                                            height: 24 * _pulseAnimation.value,
+                                            decoration: BoxDecoration(
+                                              color: Colors.red.withValues(alpha: 0.3),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        Icon(
+                                          _isListening ? Icons.mic : Icons.mic_none,
+                                          color: _isListening 
+                                              ? Colors.red 
+                                              : const Color(0xFF2D6A4F).withValues(alpha: 0.6),
+                                        ),
+                                      ],
                                     );
                                   },
+                                ),
                                 ),
                             ],
                           ),
