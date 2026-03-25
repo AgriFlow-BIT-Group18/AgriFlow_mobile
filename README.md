@@ -28,6 +28,22 @@ A high-performance Flutter mobile application tailored for farmers in Burkina Fa
 - **Persistence**: SharedPreferences for session management.
 - **Design**: Modern Material 3 UI with a focus on usability and accessibility.
 
+---
+
+## 🔄 Mobile Integration & Architecture
+
+### 📡 Backend Integration
+The app communicates with the AgriFlow Backend using the `http` package.
+- **Base URL**: `https://agriflow-backend-te8k.onrender.com/api` (Render Production).
+- **Authentication**: JWT is stored in `SharedPreferences` and attached to the `Authorization` header for all protected API calls (Orders, Deliveries, Profile).
+
+### 🤖 Smart Intelligence (Groq AI)
+Integrated AI assistants provide specialized support directly via the **Groq API**:
+- **Model**: `llama-3.1-8b-instant`.
+- **Interactions**: Optimized for voice and text, allowing farmers to ask questions about agriculture, logistics, or inventory in their local language.
+
+---
+
 ## 📂 Project Structure
 
 - `lib/`:
